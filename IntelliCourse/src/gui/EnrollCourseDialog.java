@@ -46,7 +46,7 @@ public class EnrollCourseDialog extends javax.swing.JDialog {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Course Name", "Teacher", "Date", "Number of People"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -56,7 +56,7 @@ public class EnrollCourseDialog extends javax.swing.JDialog {
         jButton1.setText("Filter");
         getContentPane().add(jButton1, java.awt.BorderLayout.PAGE_START);
 
-        jPanel1.setLayout(new java.awt.GridLayout());
+        jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton2.setText("Register");
         jPanel1.add(jButton2);

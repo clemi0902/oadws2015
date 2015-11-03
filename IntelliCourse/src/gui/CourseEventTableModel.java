@@ -7,21 +7,23 @@ package gui;
 
 import javax.swing.table.AbstractTableModel;
 
-
 /**
  *
  * @author Clemens
  */
-public class CourseTable extends AbstractTableModel{
+
+
+
+public class CourseEventTableModel extends AbstractTableModel{
 
     @Override
     public String getColumnName(int column) {
         switch (column)
         {
-            case 1: 
-                return "asdf";
-                
-            default: return "rest";
+            case 0: return "Course/Event";
+            case 1: return "Name";
+            case 2: return "Description";
+            default: return "";
         }
     }
 
@@ -29,17 +31,17 @@ public class CourseTable extends AbstractTableModel{
     
     @Override
     public int getRowCount() {
-        return 3; //To change body of generated methods, choose Tools | Templates.
+        return 100;
     }
 
     @Override
     public int getColumnCount() {
-        return 3; //To change body of generated methods, choose Tools | Templates.
+        return 4;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return null; //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
     
 }

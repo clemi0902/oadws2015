@@ -48,7 +48,7 @@ public class StudentMenu extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Course Name", "Teacher", "Date", "From - To"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
