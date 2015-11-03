@@ -78,6 +78,11 @@
             <Property name="text" type="java.lang.String" value="Enroll to Course"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JButton" name="jButton4">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Unregister"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JButton" name="jButton2">
           <Properties>
             <Property name="text" type="java.lang.String" value="Show Timetable"/>

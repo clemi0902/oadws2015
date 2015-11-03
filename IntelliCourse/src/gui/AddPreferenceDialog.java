@@ -24,6 +24,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
     public AddPreferenceDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Add Preference");
     }
 
     /**

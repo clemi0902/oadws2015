@@ -17,6 +17,7 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
     public StudentTimetableDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Student Timetable");
     }
 
     /**

@@ -63,7 +63,7 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="btOk">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Ok"/>
+            <Property name="text" type="java.lang.String" value="Login"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btOkActionPerformed"/>
@@ -100,7 +100,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Password"/>
+            <Property name="text" type="java.lang.String" value="Password:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JPasswordField" name="pfPassword">

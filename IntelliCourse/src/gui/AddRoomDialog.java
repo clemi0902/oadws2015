@@ -17,6 +17,7 @@ public class AddRoomDialog extends javax.swing.JDialog {
     public AddRoomDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Add Room");
     }
 
     /**

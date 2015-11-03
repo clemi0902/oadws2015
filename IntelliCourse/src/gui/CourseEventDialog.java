@@ -17,6 +17,7 @@ public class CourseEventDialog extends javax.swing.JDialog {
     public CourseEventDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Course - Event Menu");
     }
 
     /**

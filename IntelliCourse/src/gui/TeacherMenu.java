@@ -16,6 +16,7 @@ public class TeacherMenu extends javax.swing.JFrame {
      */
     public TeacherMenu() {
         initComponents();
+        this.setTitle("Teacher Menu");
     }
 
     /**

@@ -16,6 +16,7 @@ public class StudentMenu extends javax.swing.JFrame {
      */
     public StudentMenu() {
         initComponents();
+        this.setTitle("Student Menu");
     }
 
     /**
@@ -31,6 +32,7 @@ public class StudentMenu extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -57,6 +59,9 @@ public class StudentMenu extends javax.swing.JFrame {
 
         jButton1.setText("Enroll to Course");
         jPanel1.add(jButton1);
+
+        jButton4.setText("Unregister");
+        jPanel1.add(jButton4);
 
         jButton2.setText("Show Timetable");
         jPanel1.add(jButton2);
@@ -113,6 +118,7 @@ public class StudentMenu extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;

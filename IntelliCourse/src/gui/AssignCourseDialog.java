@@ -29,6 +29,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
         
         initComponents();
+        this.setTitle("Assign Courses");
     }
 
     /**
@@ -120,7 +121,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
         jPanel2.add(jPanel6);
 
-        jLabel3.setText("Date/Day of Week");
+        jLabel3.setText("Date/Day of Week:");
         jPanel2.add(jLabel3);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
@@ -151,7 +152,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         timeSpinner.setEditor(timeEditor);
         jPanel2.add(timeSpinner);
 
-        jLabel5.setText("End Time");
+        jLabel5.setText("End Time:");
         jPanel2.add(jLabel5);
 
         JSpinner.DateEditor timeEditor2 = new JSpinner.DateEditor(timeSpinner2, "HH:mm");

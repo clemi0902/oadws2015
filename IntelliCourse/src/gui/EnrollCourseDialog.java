@@ -9,15 +9,15 @@ package gui;
  *
  * @author Clemens
  */
-public class RoomDialog extends javax.swing.JDialog {
+public class EnrollCourseDialog extends javax.swing.JDialog {
 
     /**
-     * Creates new form RoomDialog
+     * Creates new form EnrollCourseDialog
      */
-    public RoomDialog(java.awt.Frame parent, boolean modal) {
+    public EnrollCourseDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setTitle("Rooms");
+        this.setTitle("Enroll to Course");
     }
 
     /**
@@ -31,12 +31,10 @@ public class RoomDialog extends javax.swing.JDialog {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -55,24 +53,18 @@ public class RoomDialog extends javax.swing.JDialog {
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
+        jButton1.setText("Filter");
+        getContentPane().add(jButton1, java.awt.BorderLayout.PAGE_START);
+
         jPanel1.setLayout(new java.awt.GridLayout());
 
-        jButton1.setText("Add");
-        jPanel1.add(jButton1);
-
-        jButton2.setText("Remove");
+        jButton2.setText("Register");
         jPanel1.add(jButton2);
 
-        jButton3.setText("Edit");
+        jButton3.setText("Cancel");
         jPanel1.add(jButton3);
 
-        jButton4.setText("Ok");
-        jPanel1.add(jButton4);
-
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
-
-        jButton5.setText("Filter");
-        getContentPane().add(jButton5, java.awt.BorderLayout.PAGE_START);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -94,20 +86,20 @@ public class RoomDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(RoomDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EnrollCourseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(RoomDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EnrollCourseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(RoomDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EnrollCourseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(RoomDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(EnrollCourseDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                RoomDialog dialog = new RoomDialog(new javax.swing.JFrame(), true);
+                EnrollCourseDialog dialog = new EnrollCourseDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -123,8 +115,6 @@ public class RoomDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;

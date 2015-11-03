@@ -17,6 +17,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     public TeachingStaffDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Teaching Stuff");
     }
 
     /**

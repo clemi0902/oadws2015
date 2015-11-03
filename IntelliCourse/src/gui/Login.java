@@ -68,7 +68,7 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
-        btOk.setText("Ok");
+        btOk.setText("Login");
         btOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btOkActionPerformed(evt);
@@ -92,7 +92,7 @@ public class Login extends javax.swing.JFrame {
         jPanel2.add(jLabel1);
         jPanel2.add(jTextField1);
 
-        jLabel2.setText("Password");
+        jLabel2.setText("Password:");
         jPanel2.add(jLabel2);
 
         pfPassword.setText("jPasswordField1");

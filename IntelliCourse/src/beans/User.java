@@ -10,5 +10,5 @@ package beans;
  * @author Clemens
  */
 public enum User {
-    STUDENT, TEACHER, ADMIN
+    Student, Teacher, Admin
 }
