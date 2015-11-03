@@ -5,6 +5,8 @@
  */
 package gui;
 
+import javax.swing.ButtonGroup;
+
 /**
  *
  * @author Clemens
@@ -28,6 +30,12 @@ public class AddCourseDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel5 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jLabel4 = new javax.swing.JLabel();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -41,13 +49,32 @@ public class AddCourseDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel3.setLayout(new java.awt.GridLayout());
+        jPanel5.setLayout(new java.awt.GridLayout(2, 2));
+
+        jLabel3.setText("Course/Event:");
+        jPanel5.add(jLabel3);
+
+        jRadioButton1.setText("Course");
+        jPanel5.add(jRadioButton1);
+        jPanel5.add(jLabel4);
+
+        jRadioButton2.setText("Event");
+        ButtonGroup bgChoose = new ButtonGroup();
+        bgChoose.add(jRadioButton1);
+        bgChoose.add(jRadioButton2);
+        jPanel5.add(jRadioButton2);
+
+        getContentPane().add(jPanel5, java.awt.BorderLayout.PAGE_START);
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jPanel3.setLayout(new java.awt.GridLayout(1, 0));
 
         jLabel1.setText("Course/Event Name:");
         jPanel3.add(jLabel1);
         jPanel3.add(jTextField1);
 
-        getContentPane().add(jPanel3, java.awt.BorderLayout.NORTH);
+        jPanel4.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 2));
 
@@ -61,9 +88,11 @@ public class AddCourseDialog extends javax.swing.JDialog {
 
         jPanel1.add(jScrollPane1);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jPanel4.add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setLayout(new java.awt.GridLayout());
+        getContentPane().add(jPanel4, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         jButton1.setText("Ok");
         jPanel2.add(jButton1);
@@ -123,9 +152,15 @@ public class AddCourseDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;

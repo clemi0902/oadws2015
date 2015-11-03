@@ -45,6 +45,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
         jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         btOk = new javax.swing.JButton();
         btCancel = new javax.swing.JButton();
@@ -66,7 +67,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(1, 2));
+        jPanel5.setLayout(new java.awt.GridLayout(2, 2));
 
         jLabel1.setText("Teacher:");
         jPanel5.add(jLabel1);
@@ -74,10 +75,13 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel5.add(jComboBox1);
 
-        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
-
         jButton2.setText("Show Teacher Preferences");
-        jPanel4.add(jButton2, java.awt.BorderLayout.SOUTH);
+        jPanel5.add(jButton2);
+
+        jButton4.setText("Show Bookings");
+        jPanel5.add(jButton4);
+
+        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.NORTH);
 
@@ -223,6 +227,7 @@ public class AssignCourseDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
     private javax.swing.JLabel jLabel1;

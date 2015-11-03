@@ -18,8 +18,9 @@ public class AdminMenu extends javax.swing.JFrame {
      */
     public AdminMenu() {
         initComponents();
+        this.setTitle("Admin Menu");
         TableModel tm = new CourseTable();
-        tbCourses.setModel(tm);
+        
     }
 
     /**
@@ -31,33 +32,20 @@ public class AdminMenu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tbCourses = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        tbCourses.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane1.setViewportView(tbCourses);
+        jPanel1.setLayout(new java.awt.GridLayout(5, 1));
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        jPanel1.setLayout(new java.awt.GridLayout(1, 3));
-
-        jButton2.setText("Add Course/Event");
+        jButton2.setText("Course/Event");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
@@ -65,13 +53,29 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton2);
 
-        jButton3.setText("Add Room");
+        jButton4.setText("Teaching Staff");
+        jPanel1.add(jButton4);
+
+        jButton3.setText("Room");
         jPanel1.add(jButton3);
 
-        jButton1.setText("Manage Course");
+        jButton1.setText("Manage Lecture");
         jPanel1.add(jButton1);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        jButton5.setText("Show/Adapt Schedule");
+        jPanel1.add(jButton5);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        jMenu1.setText("Log out");
+        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu1MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -80,6 +84,10 @@ public class AdminMenu extends javax.swing.JFrame {
         AssignCourseDialog aced = new AssignCourseDialog(this, rootPaneCheckingEnabled);
         aced.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
+        System.exit(0);
+    }//GEN-LAST:event_jMenu1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -121,8 +129,10 @@ public class AdminMenu extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tbCourses;
     // End of variables declaration//GEN-END:variables
 }
