@@ -38,12 +38,13 @@ public class AdminMenu extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setLayout(new java.awt.GridLayout(5, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(6, 1));
 
         jButton2.setText("Course/Event");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -64,6 +65,9 @@ public class AdminMenu extends javax.swing.JFrame {
 
         jButton5.setText("Show/Adapt Schedule");
         jPanel1.add(jButton5);
+
+        jButton6.setText("Change Curricula");
+        jPanel1.add(jButton6);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -131,6 +135,7 @@ public class AdminMenu extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
