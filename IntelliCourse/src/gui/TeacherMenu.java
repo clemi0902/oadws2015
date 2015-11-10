@@ -65,6 +65,11 @@ public class TeacherMenu extends javax.swing.JFrame {
         jPanel3.setLayout(new java.awt.GridLayout(1, 3));
 
         jButton1.setText("Add Preference");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(jButton1);
 
         jButton2.setText("Show Timetable");
@@ -79,6 +84,12 @@ public class TeacherMenu extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        AddPreferenceDialog apd = new AddPreferenceDialog(this, rootPaneCheckingEnabled);
+        apd.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
