@@ -5,6 +5,18 @@
  */
 package gui;
 
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import jdk.nashorn.internal.runtime.regexp.joni.constants.StringType;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+
 /**
  *
  * @author Clemens
@@ -17,7 +29,60 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     public TeachingStaffDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        tbAnzeige.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.setTitle("Teaching Stuff");
+        displayData();
+    }
+    
+    private void displayData() {
+        String sql;
+        sql = "select u.uid, u.username, u.password, u.vorname, u.nachname from  User  u inner join staff s USING(uid)";
+        executeQuery(sql);
+    }
+
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            SQLQuery q = session.createSQLQuery(query);
+            q.addScalar("uid",new IntegerType());
+            q.addScalar("username",new org.hibernate.type.StringType());
+            q.addScalar("password",new org.hibernate.type.StringType());
+            q.addScalar("vorname",new org.hibernate.type.StringType());
+            q.addScalar("nachname",new org.hibernate.type.StringType());
+            q.setResultTransformer(Transformers.aliasToBean(User.class));
+            List<User> resultList = q.list();
+            displayResult(resultList);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void displayResult(List resultList) {
+        Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("uid");
+        tableHead.add("Username");
+        tableHead.add("First Name");
+        tableHead.add("Last Name");
+        tableHead.add("Password");
+        
+        for (Object o : resultList) {
+            User user = new User();
+            
+            User u = (User) o;
+            Vector<Object> row = new Vector<>();
+            row.add(u.getUid());
+            row.add(u.getUsername());
+            row.add(u.getPassword());
+            row.add(u.getVorname());
+            row.add(u.getNachname());            
+            tableData.add(row);
+        }
+        tbAnzeige.setModel(new DefaultTableModel(tableData, tableHead));
+
     }
 
     /**
@@ -30,7 +95,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tbAnzeige = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -41,7 +106,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tbAnzeige.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -52,7 +117,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
                 "TeacherID", "Name", "", ""
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tbAnzeige);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -100,6 +165,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         AddTeachingStaffDialog atsd = new AddTeachingStaffDialog(null, rootPaneCheckingEnabled);
+        atsd.setIsAdd(true);
         atsd.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -107,7 +173,18 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         AddTeachingStaffDialog etsd = new AddTeachingStaffDialog(null, rootPaneCheckingEnabled);
         etsd.setTitle("Edit Teachinng Staff");
+        int rowindex = tbAnzeige.getSelectedRow();
+        int id = Integer.parseInt(tbAnzeige.getValueAt(rowindex, 0).toString());
+        String username = tbAnzeige.getValueAt(rowindex, 1).toString();
+        String  password= tbAnzeige.getValueAt(rowindex, 2).toString();
+        String vorname = tbAnzeige.getValueAt(rowindex, 3).toString();
+        String nachname = tbAnzeige.getValueAt(rowindex, 4).toString();
+        User user = new User(id,username,password,vorname,nachname);
+        etsd.setUser(user);
+        etsd.setIsAdd(false);
+        etsd.fillFields();
         etsd.setVisible(true);
+        displayData();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -166,6 +243,6 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tbAnzeige;
     // End of variables declaration//GEN-END:variables
 }

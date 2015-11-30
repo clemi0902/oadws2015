@@ -5,15 +5,41 @@
  */
 package gui;
 
+import intellicourse.entity.Staff;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 /**
  *
  * @author Clemens
  */
 public class AddTeachingStaffDialog extends javax.swing.JDialog {
 
+    
+    private boolean isAdd;
+    private String vorname;
+    private String nachname;
+    private String username;
+    private String password;
+    private User user;
     /**
      * Creates new form AddTeachingStaffDialog
      */
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public void setIsAdd(boolean isAdd) {
+        this.isAdd = isAdd;
+    }
+    
+    
     public AddTeachingStaffDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -32,16 +58,18 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        tfVorname = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        tfNachname = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        tfUsername = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
+        pfPassword = new javax.swing.JPasswordField();
+        btOk = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        getContentPane().setLayout(new java.awt.GridLayout(5, 2));
+        getContentPane().setLayout(new java.awt.GridLayout(6, 2));
 
         jLabel1.setText("Teacher ID:");
         getContentPane().add(jLabel1);
@@ -50,32 +78,36 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         jTextField1.setText("<SampleID>");
         getContentPane().add(jTextField1);
 
-        jLabel2.setText("Name:");
+        jLabel2.setText("Vorname:");
         getContentPane().add(jLabel2);
-        getContentPane().add(jTextField2);
+        getContentPane().add(tfVorname);
+
+        jLabel5.setText("Nachname:");
+        getContentPane().add(jLabel5);
+        getContentPane().add(tfNachname);
 
         jLabel3.setText("Username:");
         getContentPane().add(jLabel3);
-        getContentPane().add(jTextField3);
+        getContentPane().add(tfUsername);
 
         jLabel4.setText("Initial Password:");
         getContentPane().add(jLabel4);
 
-        jPasswordField1.setText("jPasswordField1");
-        jPasswordField1.addMouseListener(new java.awt.event.MouseAdapter() {
+        pfPassword.setText("jPasswordField1");
+        pfPassword.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jPasswordField1MouseClicked(evt);
+                pfPasswordMouseClicked(evt);
             }
         });
-        getContentPane().add(jPasswordField1);
+        getContentPane().add(pfPassword);
 
-        jButton1.setText("Ok");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btOk.setText("Ok");
+        btOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btOkActionPerformed(evt);
             }
         });
-        getContentPane().add(jButton1);
+        getContentPane().add(btOk);
 
         jButton2.setText("Cancel");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -88,19 +120,132 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jPasswordField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPasswordField1MouseClicked
-        jPasswordField1.setText("");
-    }//GEN-LAST:event_jPasswordField1MouseClicked
+    private void pfPasswordMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pfPasswordMouseClicked
+        pfPassword.setText("");
+    }//GEN-LAST:event_pfPasswordMouseClicked
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    
+    public void fillFields()
+    {
+        if(!isAdd)
+        {
+            String name = user.getUsername().toString();
+            tfUsername.setText(user.getUsername());
+            tfVorname.setText(user.getVorname());
+            tfNachname.setText(user.getNachname());
+            pfPassword.setText(user.getPassword());
+        }
+    }
+    private void btOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btOkActionPerformed
         // TODO add your handling code here:
-        this.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+        
+       vorname = tfVorname.getText();
+        nachname = tfNachname.getText();
+        username = tfUsername.getText();
+        password = pfPassword.getText();
+        if(vorname.trim().equals("") ||nachname.trim().equals("") 
+                || username.trim().equals("") ||password.trim().equals("") )
+        {
+            JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
+           
+        }
+        else
+        {
+            if(isAdd)
+            {
+                addStaff();
+            }
+            else
+            {
+                editStaff();
+            }            
+            this.dispose();
+        }
+    }//GEN-LAST:event_btOkActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    
+    private void editStaff(){
+        String sql;
+        try{
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            
+            sql = "from User where username like '" + username + "'";
+            Query q = session.createQuery(sql);
+            List resultList = q.list();
+            if(resultList.size() == 0){
+                User user2 = new User();
+                user2.setUid(user.getUid());
+                user2.setUsername(username);
+                user2.setPassword(password);
+                user2.setVorname(vorname);
+                user2.setNachname(nachname);
+
+                session.update(user2);
+                session.getTransaction().commit();
+                session.close();
+                JOptionPane.showMessageDialog(null, "Data updated succesfully !");
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(this, "User already exists", "Error", JOptionPane.ERROR_MESSAGE);
+            }        
+             
+        }catch(Exception e){
+             
+            JOptionPane.showMessageDialog(null, "Error occured !");
+            e.printStackTrace();
+        }
+    }
+  
+    
+    
+            
+    private void addStaff()
+    {
+        int id;
+        String sql;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+   
+        User user = new User();
+        user.setVorname(vorname);
+        user.setNachname(nachname);
+        user.setUsername(username);
+        user.setPassword(password);
+        
+        sql = "from User where username like '" + username + "'";
+        Query q = session.createQuery(sql);
+        List resultList = q.list();
+        if(resultList.size() == 0){
+            session.save(user);
+            Staff staff = new Staff(user);
+            session.save(staff);
+            session.getTransaction().commit();
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, "User already exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+                
+    }    
+     
+     private void executeHQLQuery(String hql) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(hql);
+            List resultList = q.list();
+            session.getTransaction().commit();
+        } catch (HibernateException he) {
+            he.printStackTrace();
+        }
+
+    }
     /**
      * @param args the command line arguments
      */
@@ -144,15 +289,17 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btOk;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JPasswordField jPasswordField1;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JPasswordField pfPassword;
+    private javax.swing.JTextField tfNachname;
+    private javax.swing.JTextField tfUsername;
+    private javax.swing.JTextField tfVorname;
     // End of variables declaration//GEN-END:variables
 }
