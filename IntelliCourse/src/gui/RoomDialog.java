@@ -7,6 +7,9 @@ package gui;
 
 import intellicourse.entity.Room;
 import intellicourse.util.HibernateUtil;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.BorderFactory;
@@ -74,6 +77,11 @@ public class RoomDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setText("Remove");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onRemoveRoom(evt);
+            }
+        });
         jPanel1.add(jButton2);
 
         jButton3.setText("Edit");
@@ -130,7 +138,9 @@ public class RoomDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         AddRoomDialog ard = new AddRoomDialog(null, rootPaneCheckingEnabled);
+        ard.addWindowListener(new MyWindowAdapter());
         ard.setVisible(true);
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -143,6 +153,25 @@ public class RoomDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void onRemoveRoom(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onRemoveRoom
+        int i = tbRooms.getSelectedRow();
+        int index = -1;
+        try {
+            index = Integer.parseInt(tbRooms.getModel().getValueAt(i, 0).toString());
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Object persistenceInstance = session.load(Room.class, index);
+            if (persistenceInstance != null)
+            {
+                session.delete(persistenceInstance);
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        showFilteredData();
+    }//GEN-LAST:event_onRemoveRoom
 
     private void showFilteredData() {
         checkInput();
@@ -201,6 +230,27 @@ public class RoomDialog extends javax.swing.JDialog {
             tfSeats.setText("");
         }
 
+    }
+
+ 
+    private class MyWindowAdapter extends WindowAdapter{
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            RoomDialog.this.showFilteredData();
+        }
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+            RoomDialog.this.showFilteredData();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+            RoomDialog.this.showFilteredData();
+        }
+        
+        
     }
 
     private class MyDocumentListener implements DocumentListener {

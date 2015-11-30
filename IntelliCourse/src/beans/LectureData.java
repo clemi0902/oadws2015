@@ -9,6 +9,6 @@ package beans;
  *
  * @author Clemens
  */
-public enum User {
-    Student, Teacher, Admin
+public enum LectureData {
+    Course, Event
 }

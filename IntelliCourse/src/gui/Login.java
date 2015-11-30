@@ -5,12 +5,17 @@
  */
 package gui;
 
-import beans.User;
+import beans.UserData;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 /**
  *
@@ -22,7 +27,7 @@ public class Login extends javax.swing.JFrame {
      * Creates new form Login
      */
     public Login() {
-                try {
+        try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -48,15 +53,15 @@ public class Login extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel3 = new javax.swing.JPanel();
-        cbUser = new javax.swing.JComboBox(User.values());
+        cbUser = new javax.swing.JComboBox(UserData.values());
         jPanel1 = new javax.swing.JPanel();
         btOk = new javax.swing.JButton();
         btCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        tfUsername = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        pfPassword = new javax.swing.JPasswordField();
+        tfPassword = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -90,18 +95,18 @@ public class Login extends javax.swing.JFrame {
 
         jLabel1.setText("Username:");
         jPanel2.add(jLabel1);
-        jPanel2.add(jTextField1);
+        jPanel2.add(tfUsername);
 
         jLabel2.setText("Password:");
         jPanel2.add(jLabel2);
 
-        pfPassword.setText("jPasswordField1");
-        pfPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+        tfPassword.setText("jPasswordField1");
+        tfPassword.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 onFocusGained(evt);
             }
         });
-        jPanel2.add(pfPassword);
+        jPanel2.add(tfPassword);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -109,7 +114,7 @@ public class Login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void onFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_onFocusGained
-        pfPassword.setText("");
+        tfPassword.setText("");
     }//GEN-LAST:event_onFocusGained
 
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelActionPerformed
@@ -117,23 +122,105 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_btCancelActionPerformed
 
     private void btOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btOkActionPerformed
-       this.dispose();
-        switch (cbUser.getSelectedIndex())
-       {
-           case 0:
-               StudentMenu sm = new StudentMenu();
-               sm.setVisible(true);
-               break;
-           case 1:
-               TeacherMenu tm = new TeacherMenu();
-               tm.setVisible(true);
-               break;
-           case 2:
-               AdminMenu am = new AdminMenu();
-               am.setVisible(true);
-               break;
-       }
+
+        switch (cbUser.getSelectedIndex()) {
+            case 0:
+                if (checkStudentLogin()) {
+                    StudentMenu sm = new StudentMenu();
+                    sm.setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+
+                break;
+            case 1:
+                if (checkStaffLogin()) {
+                    TeacherMenu tm = new TeacherMenu();
+                    tm.setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+
+                break;
+            case 2:
+                if (checkAdminLogin()) {
+                    AdminMenu am = new AdminMenu();
+                    am.setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+        }
     }//GEN-LAST:event_btOkActionPerformed
+
+    private boolean checkAdminLogin() {
+        List resultList = null;
+        try {
+            String query = "from Admin a "
+                    + "WHERE a.uid = (SELECT u2.uid "
+                    + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
+                    + "AND password LIKE '" + tfPassword.getText() + "')";
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(query);
+            resultList = q.list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+        }
+
+        if (resultList.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkStudentLogin() {
+        List resultList = null;
+        try {
+            String query = "from Student s "
+                    + "WHERE s.uid = (SELECT u2.uid "
+                    + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
+                    + "AND password LIKE '" + tfPassword.getText() + "')";
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(query);
+            resultList = q.list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+        }
+
+        if (resultList.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean checkStaffLogin() {
+        List resultList = null;
+        try {
+            String query = "from Staff s "
+                    + "WHERE s.uid = (SELECT u2.uid "
+                    + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
+                    + "AND password LIKE '" + tfPassword.getText() + "')";
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(query);
+            resultList = q.list();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+        }
+
+        if (resultList.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -179,7 +266,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JPasswordField pfPassword;
+    private javax.swing.JPasswordField tfPassword;
+    private javax.swing.JTextField tfUsername;
     // End of variables declaration//GEN-END:variables
 }

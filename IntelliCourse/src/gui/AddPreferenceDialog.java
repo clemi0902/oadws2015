@@ -6,8 +6,11 @@
 package gui;
 
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
@@ -25,6 +28,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setTitle("Add Preference");
+        cbCourseEvent.addActionListener(new MyActionListener());
     }
 
     /**
@@ -38,10 +42,14 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        cbCourseEvent = new javax.swing.JComboBox(beans.LectureData.values());
         jLabel2 = new javax.swing.JLabel();
-        jComboBox2 = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        jTextField2 = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jTextField3 = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
@@ -54,27 +62,54 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(500, 300));
 
         jPanel1.setLayout(new java.awt.GridLayout(5, 2));
 
-        jLabel1.setText("Course:");
+        jLabel1.setText("Course/Event");
         jPanel1.add(jLabel1);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel1.add(jComboBox1);
+        /*
+        cbCourseEvent.setModel(null);
+        */
+        jPanel1.add(cbCourseEvent);
 
         jLabel2.setText("Room:");
         jPanel1.add(jLabel2);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel1.add(jComboBox2);
+        jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jLabel3.setText("Date/Day of Week");
-        jPanel1.add(jLabel3);
+        jTextField2.setEnabled(false);
+        jPanel4.add(jTextField2, java.awt.BorderLayout.CENTER);
+
+        jButton4.setText("...");
+        jPanel4.add(jButton4, java.awt.BorderLayout.EAST);
+
+        jPanel1.add(jPanel4);
+
+        jPanel5.setLayout(new java.awt.BorderLayout());
+        jPanel5.setBorder(BorderFactory.createTitledBorder("Start Date"));
+
+        jTextField3.setEnabled(false);
+        jTextField3.setFocusable(false);
+        jPanel5.add(jTextField3, java.awt.BorderLayout.CENTER);
+
+        try{
+            Image img = ImageIO.read(getClass().getResource("../resources/calendar-icon.png"));
+            Image resizedImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
+            jButton5.setIcon(new ImageIcon(resizedImage));
+        }catch(IOException ex)
+        {
+        }
+        jPanel5.add(jButton5, java.awt.BorderLayout.EAST);
+
+        jPanel1.add(jPanel5);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         jTextField1.setEditable(false);
+        jTextField1.setEnabled(false);
+        jTextField1.setFocusable(false);
         jPanel3.add(jTextField1, java.awt.BorderLayout.CENTER);
 
         try{
@@ -85,6 +120,8 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         {
         }
         jPanel3.add(jButton3, java.awt.BorderLayout.LINE_END);
+
+        jPanel3.setBorder(BorderFactory.createTitledBorder("End Date"));
 
         jPanel1.add(jPanel3);
 
@@ -136,6 +173,30 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private class MyActionListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            changeGUI();
+        }
+        private void changeGUI()
+        {
+            if (cbCourseEvent.getSelectedItem().toString().equals("Course"))
+            {
+                jPanel3.setVisible(true);
+                jPanel5.setBorder(BorderFactory.createTitledBorder("Start Date"));
+            }
+
+            else
+            {
+                jPanel3.setVisible(false);
+                jPanel5.setBorder(BorderFactory.createTitledBorder("Date"));
+            }
+
+        }
+        
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -179,21 +240,25 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox cbCourseEvent;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
 }
