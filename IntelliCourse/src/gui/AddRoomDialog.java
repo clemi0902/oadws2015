@@ -5,6 +5,10 @@
  */
 package gui;
 
+import intellicourse.entity.Room;
+import intellicourse.util.HibernateUtil;
+import org.hibernate.Session;
+
 /**
  *
  * @author Clemens
@@ -31,59 +35,80 @@ public class AddRoomDialog extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        tfName = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        tfSeats = new javax.swing.JTextField();
+        btOk = new javax.swing.JButton();
+        btCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jPanel1.setLayout(new java.awt.GridLayout(4, 2));
+        jPanel1.setLayout(new java.awt.GridLayout(3, 2));
 
         jLabel1.setText("Room Name:");
         jPanel1.add(jLabel1);
-        jPanel1.add(jTextField1);
-
-        jLabel3.setText("Address:");
-        jPanel1.add(jLabel3);
-        jPanel1.add(jTextField3);
+        jPanel1.add(tfName);
 
         jLabel2.setText("Number of Seats:");
         jPanel1.add(jLabel2);
-        jPanel1.add(jTextField2);
+        jPanel1.add(tfSeats);
 
-        jButton3.setText("Ok");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btOk.setText("Ok");
+        btOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                onOk(evt);
             }
         });
-        jPanel1.add(jButton3);
+        jPanel1.add(btOk);
 
-        jButton4.setText("Cancel");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btCancel.setText("Cancel");
+        btCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                onCancel(evt);
             }
         });
-        jPanel1.add(jButton4);
+        jPanel1.add(btCancel);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void onOk(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onOk
+        if (!tfName.getText().trim().equals("") && checkSeats())
+        {
+            addRoom();
+            this.dispose();
+        }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_onOk
 
+    private void onCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onCancel
+        this.dispose();
+    }//GEN-LAST:event_onCancel
+
+    
+    private void addRoom()
+    {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+   
+        Room room = new Room();
+        room.setName(tfName.getText());
+        room.setAnzSitzplatz(Integer.parseInt(tfSeats.getText()));
+        session.save(room);
+        session.getTransaction().commit();
+    }
+    
+    private boolean checkSeats()
+    {
+        try {
+            int seats = Integer.parseInt(tfSeats.getText());
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
     /**
      * @param args the command line arguments
      */
@@ -127,14 +152,12 @@ public class AddRoomDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btCancel;
+    private javax.swing.JButton btOk;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField tfName;
+    private javax.swing.JTextField tfSeats;
     // End of variables declaration//GEN-END:variables
 }

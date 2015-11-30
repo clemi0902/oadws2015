@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 29.11.2015 23:06:33 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="intellicourse.entity.Lecture" table="lecture" catalog="oad_db" optimistic-lock="version">
+        <id name="lid" type="java.lang.Integer">
+            <column name="lid" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="room" class="intellicourse.entity.Room" fetch="select">
+            <column name="rid" not-null="true" />
+        </many-to-one>
+        <many-to-one name="staff" class="intellicourse.entity.Staff" fetch="select">
+            <column name="uid" not-null="true" />
+        </many-to-one>
+        <property name="name" type="string">
+            <column name="name" length="50" not-null="true" />
+        </property>
+        <property name="beschreibung" type="string">
+            <column name="beschreibung" length="65535" not-null="true" />
+        </property>
+        <property name="von" type="date">
+            <column name="von" length="10" not-null="true" />
+        </property>
+        <property name="bis" type="date">
+            <column name="bis" length="10" not-null="true" />
+        </property>
+        <one-to-one name="event" class="intellicourse.entity.Event"></one-to-one>
+        <one-to-one name="course" class="intellicourse.entity.Course"></one-to-one>
+        <set name="students" table="student_lecture" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="lid" not-null="true" />
+            </key>
+            <many-to-many entity-name="intellicourse.entity.Student">
+                <column name="uid" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -5,6 +5,18 @@
  */
 package gui;
 
+import intellicourse.entity.Room;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.BorderFactory;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
 /**
  *
  * @author Clemens
@@ -17,7 +29,11 @@ public class RoomDialog extends javax.swing.JDialog {
     public RoomDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        tfName.getDocument().addDocumentListener(new MyDocumentListener());
+        tfSeats.getDocument().addDocumentListener(new MyDocumentListener());
         this.setTitle("Rooms");
+        tbRooms.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        showFilteredData();
     }
 
     /**
@@ -29,31 +45,23 @@ public class RoomDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbRooms = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        tfName = new javax.swing.JTextField();
+        tfSeats = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
-            },
-            new String [] {
-                "Room Name", "Address", "Number of Seats"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
-
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
@@ -84,10 +92,38 @@ public class RoomDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jButton4);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        jPanel2.add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jButton5.setText("Filter");
-        getContentPane().add(jButton5, java.awt.BorderLayout.PAGE_START);
+        tbRooms.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Room Name", "Address", "Number of Seats"
+            }
+        ));
+        jScrollPane1.setViewportView(tbRooms);
+
+        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel3.setLayout(new java.awt.GridLayout(2, 2));
+
+        jLabel1.setText("Name:");
+        jPanel3.add(jLabel1);
+
+        jLabel2.setText("Minimum of Seats");
+        jPanel3.add(jLabel2);
+        jPanel3.add(tfName);
+        jPanel3.add(tfSeats);
+
+        jPanel3.setBorder(BorderFactory.createTitledBorder("Filter by:"));
+
+        getContentPane().add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -107,6 +143,88 @@ public class RoomDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void showFilteredData() {
+        checkInput();
+        String QUERY = null;
+        if (tfName.getText().trim().equals("") && tfSeats.getText().trim().equals("")) {
+            QUERY = "from Room";
+        } else if (tfName.getText().trim().equals("")) {
+            QUERY = "from Room WHERE anzSitzplatz >= " + tfSeats.getText();
+        } else if (tfSeats.getText().trim().equals("")) {
+            QUERY = "from Room WHERE UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+        } else {
+            QUERY = "from Room WHERE anzSitzplatz >= " + tfSeats.getText()
+                    + " AND UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+        }
+        executeQuery(QUERY);
+
+    }
+
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(query);
+            List resultList = q.list();
+            displayResult(resultList);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void displayResult(List resultList) {
+        Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("RoomID");
+        tableHead.add("Room Name");
+        tableHead.add("Number of Seats");
+        for (Object o : resultList) {
+
+            Room r = (Room) o;
+            Vector<Object> row = new Vector<>();
+            row.add(r.getRid());
+            row.add(r.getName());
+            row.add(r.getAnzSitzplatz());
+            tableData.add(row);
+        }
+        tbRooms.setModel(new DefaultTableModel(tableData, tableHead));
+
+    }
+
+    private void checkInput() {
+        try {
+            int input = Integer.parseInt(tfSeats.getText());
+        } catch (Exception e) {
+            tfSeats.setText("");
+        }
+
+    }
+
+    private class MyDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            changeTable();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            changeTable();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            changeTable();
+        }
+
+        private void changeTable() {
+            RoomDialog.this.showFilteredData();
+        }
+
+    }
 
     /**
      * @param args the command line arguments
@@ -155,9 +273,14 @@ public class RoomDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tbRooms;
+    private javax.swing.JTextField tfName;
+    private javax.swing.JTextField tfSeats;
     // End of variables declaration//GEN-END:variables
 }

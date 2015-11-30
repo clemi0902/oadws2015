@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 29.11.2015 23:06:33 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="intellicourse.entity.Admin" table="admin" catalog="oad_db" optimistic-lock="version">
+        <id name="uid" type="java.lang.Integer">
+            <column name="uid" />
+            <generator class="foreign">
+                <param name="property">user</param>
+            </generator>
+        </id>
+        <one-to-one name="user" class="intellicourse.entity.User" constrained="true"></one-to-one>
+    </class>
+</hibernate-mapping>
