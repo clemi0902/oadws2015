@@ -5,7 +5,17 @@
  */
 package gui;
 
+import intellicourse.entity.Course;
+import intellicourse.entity.Event;
+import intellicourse.entity.Lecture;
+import intellicourse.entity.Staff;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
 import javax.swing.ButtonGroup;
+import javax.swing.JOptionPane;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 /**
  *
@@ -16,12 +26,41 @@ public class AddCourseDialog extends javax.swing.JDialog {
     /**
      * Creates new form AddCourseDialog
      */
+    
+        private boolean isAdd;
+    private boolean isRb1;
+    private String name;
+    private String beschreibung;
+    private String radioTex;
+    private Lecture lecture;
+    
     public AddCourseDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setTitle("Add Course/Event");
     }
 
+    
+    public void setLecture(Lecture lecture) {
+        this.lecture = lecture;
+    }
+    public void setIsAdd(boolean isAdd) {
+        this.isAdd = isAdd;
+    }
+    public void setIsRb1(boolean isRb1) {
+        this.isRb1 = isRb1;
+    }
+
+     public void fillFields()
+    {
+        if(!isAdd)
+        {
+            tfName.setText(lecture.getName());
+            taBeschreibung.setText(lecture.getBeschreibung());
+            jRadioButton1.setEnabled(false);
+            jRadioButton2.setEnabled(false);
+        }
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -39,11 +78,11 @@ public class AddCourseDialog extends javax.swing.JDialog {
         jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        tfName = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        taBeschreibung = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -74,7 +113,7 @@ public class AddCourseDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Course/Event Name:");
         jPanel3.add(jLabel1);
-        jPanel3.add(jTextField1);
+        jPanel3.add(tfName);
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.NORTH);
 
@@ -84,9 +123,9 @@ public class AddCourseDialog extends javax.swing.JDialog {
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jPanel1.add(jLabel2);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        taBeschreibung.setColumns(20);
+        taBeschreibung.setRows(5);
+        jScrollPane1.setViewportView(taBeschreibung);
 
         jPanel1.add(jScrollPane1);
 
@@ -119,9 +158,94 @@ public class AddCourseDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         //TODO add Course/Event to DB
-        this.dispose();
+        name = tfName.getText();
+        beschreibung = taBeschreibung.getText();
+        if(name.trim().equals("") ||beschreibung.trim().equals(""))
+        {
+            JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            if(jRadioButton1.isSelected())
+            {
+                if(isAdd)
+                {
+                    addCourse();
+                }
+                else
+                {
+                    editCourse();
+                    
+                }
+            }
+            if(jRadioButton2.isSelected())
+            {
+                if(isAdd)
+                {
+                    addEvent();
+                }
+                else
+                {
+                     editCourse();
+                }
+            } 
+            this.dispose();
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void addCourse()
+    {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+   
+        Lecture lecture = new Lecture();
+        lecture.setName(name);
+        lecture.setBeschreibung(beschreibung);
+        
+        session.save(lecture);
+        Course course = new Course(lecture);
+        session.save(course);
+        session.getTransaction().commit();
+    } 
+    private void addEvent()
+    {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+   
+        Lecture lecture = new Lecture();
+        lecture.setName(name);
+        lecture.setBeschreibung(beschreibung);
+        
+        session.save(lecture);
+        Event event = new Event(lecture);
+        session.save(event);
+        session.getTransaction().commit();
+    } 
+    
+    private void editCourse(){
+        String sql;
+        try{
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            
+            
+            Lecture lecture2 = new Lecture();
+            lecture2.setLid(lecture.getLid());
+            lecture2.setName(name);
+            lecture2.setBeschreibung(beschreibung);
+            
+            session.update(lecture2);
+            session.getTransaction().commit();
+            session.close();
+            JOptionPane.showMessageDialog(null, "Data updated succesfully !");
+                  
+             
+        }catch(Exception e){
+             
+            JOptionPane.showMessageDialog(null, "Error occured !");
+            e.printStackTrace();
+        }
+    }
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -183,7 +307,7 @@ public class AddCourseDialog extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextArea taBeschreibung;
+    private javax.swing.JTextField tfName;
     // End of variables declaration//GEN-END:variables
 }

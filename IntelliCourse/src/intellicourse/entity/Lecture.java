@@ -5,6 +5,7 @@ package intellicourse.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -45,6 +46,15 @@ public class Lecture  implements java.io.Serializable {
     public Lecture() {
     }
 
+        public Lecture(Integer lid, String name, String beschreibung) {
+        this.lid = lid;
+        this.name = name;
+        this.beschreibung = beschreibung;
+    }
+    public Lecture(String name, String beschreibung) {
+        this.name = name;
+        this.beschreibung = beschreibung;
+    }
 	
     public Lecture(Room room, Staff staff, String name, String beschreibung, Date von, Date bis, int preference) {
         this.room = room;
@@ -71,7 +81,7 @@ public class Lecture  implements java.io.Serializable {
      @Id @GeneratedValue(strategy=IDENTITY)
 
     
-    @Column(name="lid", unique=true, nullable=false)
+    @Column(name="lid", unique=true, nullable=true)
     public Integer getLid() {
         return this.lid;
     }
@@ -81,7 +91,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
 @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="rid", nullable=false)
+    @JoinColumn(name="rid", nullable=true)
     public Room getRoom() {
         return this.room;
     }
@@ -91,7 +101,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
 @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="uid", nullable=false)
+    @JoinColumn(name="uid", nullable=true)
     public Staff getStaff() {
         return this.staff;
     }
@@ -101,7 +111,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
     
-    @Column(name="name", nullable=false, length=50)
+    @Column(name="name", nullable=true, length=50)
     public String getName() {
         return this.name;
     }
@@ -111,7 +121,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
     
-    @Column(name="beschreibung", nullable=false, length=65535)
+    @Column(name="beschreibung", nullable=true, length=65535)
     public String getBeschreibung() {
         return this.beschreibung;
     }
@@ -121,7 +131,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.TIME)
-    @Column(name="von", nullable=false, length=8)
+    @Column(name="von", nullable=true, length=8)
     public Date getVon() {
         return this.von;
     }
@@ -131,7 +141,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.TIME)
-    @Column(name="bis", nullable=false, length=8)
+    @Column(name="bis", nullable=true, length=8)
     public Date getBis() {
         return this.bis;
     }
@@ -141,7 +151,7 @@ public class Lecture  implements java.io.Serializable {
     }
 
     
-    @Column(name="preference", nullable=false)
+    @Column(name="preference", nullable=true)
     public int getPreference() {
         return this.preference;
     }
@@ -170,8 +180,8 @@ public class Lecture  implements java.io.Serializable {
 
 @ManyToMany(fetch=FetchType.LAZY)
     @JoinTable(name="student_lecture", catalog="oad_db", joinColumns = { 
-        @JoinColumn(name="lid", nullable=false, updatable=false) }, inverseJoinColumns = { 
-        @JoinColumn(name="uid", nullable=false, updatable=false) })
+        @JoinColumn(name="lid", nullable=true, updatable=false) }, inverseJoinColumns = { 
+        @JoinColumn(name="uid", nullable=true, updatable=false) })
     public Set getStudents() {
         return this.students;
     }

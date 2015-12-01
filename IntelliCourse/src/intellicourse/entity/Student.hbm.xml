@@ -12,20 +12,20 @@
         </id>
         <one-to-one name="user" class="intellicourse.entity.User" constrained="true"></one-to-one>
         <property name="adresse" type="string">
-            <column name="adresse" length="200" not-null="true" />
+            <column name="adresse" length="200" not-null="false" />
         </property>
         <property name="matnr" type="int">
-            <column name="matnr" not-null="true" />
+            <column name="matnr" not-null="false" />
         </property>
         <property name="aktSemester" type="int">
-            <column name="akt_semester" not-null="true" />
+            <column name="akt_semester" not-null="false" />
         </property>
-        <set name="lectures" cascade="all" table="student_lecture" inverse="true" lazy="true" fetch="select">
+        <set name="lectures" table="student_lecture" inverse="true" lazy="true" fetch="select">
             <key>
-                <column name="uid" not-null="true" />
+                <column name="uid" not-null="false" />
             </key>
             <many-to-many entity-name="intellicourse.entity.Lecture">
-                <column name="lid" not-null="true" />
+                <column name="lid" not-null="false" />
             </many-to-many>
         </set>
     </class>

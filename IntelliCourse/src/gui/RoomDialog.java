@@ -6,6 +6,7 @@
 package gui;
 
 import intellicourse.entity.Room;
+import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -18,6 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 /**
@@ -87,7 +89,7 @@ public class RoomDialog extends javax.swing.JDialog {
         jButton3.setText("Edit");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                onEdit(evt);
             }
         });
         jPanel1.add(jButton3);
@@ -143,11 +145,22 @@ public class RoomDialog extends javax.swing.JDialog {
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        AddRoomDialog erd = new AddRoomDialog(null, rootPaneCheckingEnabled);
+    private void onEdit(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onEdit
+        int selectedIndex = tbRooms.getSelectedRow();
+        if (selectedIndex >= 0)
+        {
+            AddRoomDialog erd = new AddRoomDialog(null, rootPaneCheckingEnabled);
+            erd.addWindowListener(new MyWindowAdapter());
         erd.setTitle("Edit Room");
-        erd.setVisible(true);
-    }//GEN-LAST:event_jButton3ActionPerformed
+            erd.setEditMode();
+            Room room = new Room(Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 0).toString()), 
+                    tbRooms.getModel().getValueAt(selectedIndex, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 2).toString()));
+            erd.showRoom(room);
+            erd.setVisible(true);
+        }
+        
+        
+    }//GEN-LAST:event_onEdit
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
@@ -156,21 +169,43 @@ public class RoomDialog extends javax.swing.JDialog {
 
     private void onRemoveRoom(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onRemoveRoom
         int i = tbRooms.getSelectedRow();
-        int index = -1;
+        if (i >= 0)
+        {
+        String sql = null;
+        SQLQuery query = null;
         try {
-            index = Integer.parseInt(tbRooms.getModel().getValueAt(i, 0).toString());
+            int rid = Integer.parseInt(tbRooms.getModel().getValueAt(i, 0).toString());
+            Room room = new Room(rid, tbRooms.getModel().getValueAt(i, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(i, 2).toString()));
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            Object persistenceInstance = session.load(Room.class, index);
-            if (persistenceInstance != null)
+            sql = "SELECT lid FROM lecture WHERE rid = " + rid;
+            query = session.createSQLQuery(sql);
+            List results = query.list();
+            for (Object o : results)
             {
-                session.delete(persistenceInstance);
+                int lid = (int) o;
+                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
+                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
+                query = session.createSQLQuery(sqlCourse);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlEvent);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlStudLect);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlLect);
+                query.executeUpdate(); 
             }
+            String sqlRoom = "DELETE FROM room WHERE rid = " + rid;
+            query = session.createSQLQuery(sqlRoom);
+            query.executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
         }
         showFilteredData();
+        }
     }//GEN-LAST:event_onRemoveRoom
 
     private void showFilteredData() {

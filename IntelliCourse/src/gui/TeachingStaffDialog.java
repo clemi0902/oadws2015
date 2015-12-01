@@ -7,9 +7,15 @@ package gui;
 
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.List;
 import java.util.Vector;
+import javax.swing.BorderFactory;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import jdk.nashorn.internal.runtime.regexp.joni.constants.StringType;
 import org.hibernate.SQLQuery;
@@ -29,6 +35,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     public TeachingStaffDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        tfFilterUsername.getDocument().addDocumentListener(new MyDocumentListener());
+        tfFilterFirstName.getDocument().addDocumentListener(new MyDocumentListener());
+        tfFilterLastName.getDocument().addDocumentListener(new MyDocumentListener());
         tbAnzeige.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.setTitle("Teaching Stuff");
         displayData();
@@ -36,7 +45,14 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     
     private void displayData() {
         String sql;
-        sql = "select u.uid, u.username, u.password, u.vorname, u.nachname from  User  u inner join staff s USING(uid)";
+        if (tfFilterUsername.getText().trim().equals("") && tfFilterFirstName.getText().trim().equals("") && tfFilterLastName.getText().trim().equals("")) {
+            sql = "select u.uid, u.username, u.password, u.vorname, u.nachname from  User  u inner join staff s USING(uid)";
+        } else
+            sql = "select u.uid, u.username, u.password, u.vorname, u.nachname from  User  u inner join staff s USING(uid) "
+                    + "WHERE UPPER(u.username) LIKE '" + tfFilterUsername.getText().trim().toUpperCase() + "%' "
+                    + "AND UPPER(u.vorname) LIKE '" + tfFilterFirstName.getText().trim().toUpperCase() + "%' "
+                    + "AND UPPER(u.nachname) LIKE '" + tfFilterLastName.getText().trim().toUpperCase() + "%'";
+        
         executeQuery(sql);
     }
 
@@ -47,9 +63,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
             SQLQuery q = session.createSQLQuery(query);
             q.addScalar("uid",new IntegerType());
             q.addScalar("username",new org.hibernate.type.StringType());
-            q.addScalar("password",new org.hibernate.type.StringType());
             q.addScalar("vorname",new org.hibernate.type.StringType());
             q.addScalar("nachname",new org.hibernate.type.StringType());
+            q.addScalar("password",new org.hibernate.type.StringType());
             q.setResultTransformer(Transformers.aliasToBean(User.class));
             List<User> resultList = q.list();
             displayResult(resultList);
@@ -76,9 +92,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
             Vector<Object> row = new Vector<>();
             row.add(u.getUid());
             row.add(u.getUsername());
-            row.add(u.getPassword());
             row.add(u.getVorname());
-            row.add(u.getNachname());            
+            row.add(u.getNachname());
+            row.add(u.getPassword());
             tableData.add(row);
         }
         tbAnzeige.setModel(new DefaultTableModel(tableData, tableHead));
@@ -102,7 +118,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jButton5 = new javax.swing.JButton();
+        tfFilterUsername = new javax.swing.JTextField();
+        tfFilterFirstName = new javax.swing.JTextField();
+        tfFilterLastName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -152,10 +170,16 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setLayout(new java.awt.BorderLayout());
+        jPanel2.setLayout(new java.awt.GridLayout(1, 4));
 
-        jButton5.setText("Filter");
-        jPanel2.add(jButton5, java.awt.BorderLayout.CENTER);
+        tfFilterUsername.setBorder(BorderFactory.createTitledBorder("Filter Username:"));
+        jPanel2.add(tfFilterUsername);
+
+        tfFilterFirstName.setBorder(BorderFactory.createTitledBorder("Filter First Name:"));
+        jPanel2.add(tfFilterFirstName);
+
+        tfFilterLastName.setBorder(BorderFactory.createTitledBorder("Filter Last Name:"));
+        jPanel2.add(tfFilterLastName);
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -165,8 +189,10 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         AddTeachingStaffDialog atsd = new AddTeachingStaffDialog(null, rootPaneCheckingEnabled);
+        atsd.addWindowListener(new MyWindowAdapter());
         atsd.setIsAdd(true);
         atsd.setVisible(true);
+     
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -176,9 +202,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         int rowindex = tbAnzeige.getSelectedRow();
         int id = Integer.parseInt(tbAnzeige.getValueAt(rowindex, 0).toString());
         String username = tbAnzeige.getValueAt(rowindex, 1).toString();
-        String  password= tbAnzeige.getValueAt(rowindex, 2).toString();
-        String vorname = tbAnzeige.getValueAt(rowindex, 3).toString();
-        String nachname = tbAnzeige.getValueAt(rowindex, 4).toString();
+        String  password= tbAnzeige.getValueAt(rowindex, 4).toString();
+        String vorname = tbAnzeige.getValueAt(rowindex, 2).toString();
+        String nachname = tbAnzeige.getValueAt(rowindex, 3).toString();
         User user = new User(id,username,password,vorname,nachname);
         etsd.setUser(user);
         etsd.setIsAdd(false);
@@ -239,10 +265,52 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tbAnzeige;
+    private javax.swing.JTextField tfFilterFirstName;
+    private javax.swing.JTextField tfFilterLastName;
+    private javax.swing.JTextField tfFilterUsername;
     // End of variables declaration//GEN-END:variables
+
+    private  class MyWindowAdapter extends WindowAdapter {
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+        
+    }
+
+    
+    private class MyDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            TeachingStaffDialog.this.displayData();
+        }
+
+        
+    }
 }

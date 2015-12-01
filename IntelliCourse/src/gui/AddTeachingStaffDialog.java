@@ -56,7 +56,7 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        tfID = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         tfVorname = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
@@ -74,9 +74,10 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         jLabel1.setText("Teacher ID:");
         getContentPane().add(jLabel1);
 
-        jTextField1.setEditable(false);
-        jTextField1.setText("<SampleID>");
-        getContentPane().add(jTextField1);
+        tfID.setEditable(false);
+        tfID.setText("<SampleID>");
+        tfID.setEnabled(false);
+        getContentPane().add(tfID);
 
         jLabel2.setText("Vorname:");
         getContentPane().add(jLabel2);
@@ -130,6 +131,7 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         if(!isAdd)
         {
             String name = user.getUsername().toString();
+            tfID.setText(user.getUid()+"");
             tfUsername.setText(user.getUsername());
             tfVorname.setText(user.getVorname());
             tfNachname.setText(user.getNachname());
@@ -173,27 +175,28 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         try{
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            
-            sql = "from User where username like '" + username + "'";
-            Query q = session.createQuery(sql);
-            List resultList = q.list();
-            if(resultList.size() == 0){
-                User user2 = new User();
-                user2.setUid(user.getUid());
-                user2.setUsername(username);
-                user2.setPassword(password);
-                user2.setVorname(vorname);
-                user2.setNachname(nachname);
-
-                session.update(user2);
+            User user = new User(Integer.parseInt(tfID.getText()), tfUsername.getText(), pfPassword.getText(), tfVorname.getText(), tfNachname.getText());
+            session.update(user);
+//            sql = "from User where username like '" + username + "'";
+//            Query q = session.createQuery(sql);
+//            List resultList = q.list();
+//            if(resultList.size() == 0){
+//                User user2 = new User();
+//                user2.setUid(user.getUid());
+//                user2.setUsername(username);
+//                user2.setPassword(password);
+//                user2.setVorname(vorname);
+//                user2.setNachname(nachname);
+//
+//                session.update(user2);
                 session.getTransaction().commit();
                 session.close();
-                JOptionPane.showMessageDialog(null, "Data updated succesfully !");
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(this, "User already exists", "Error", JOptionPane.ERROR_MESSAGE);
-            }        
+//                JOptionPane.showMessageDialog(null, "Data updated succesfully !");
+            
+//            else
+//            {
+//                JOptionPane.showMessageDialog(this, "User already exists", "Error", JOptionPane.ERROR_MESSAGE);
+//            }        
              
         }catch(Exception e){
              
@@ -296,8 +299,8 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JPasswordField pfPassword;
+    private javax.swing.JTextField tfID;
     private javax.swing.JTextField tfNachname;
     private javax.swing.JTextField tfUsername;
     private javax.swing.JTextField tfVorname;

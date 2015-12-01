@@ -34,6 +34,11 @@ public class Event  implements java.io.Serializable {
     public Event() {
     }
 
+    
+        public Event(Lecture lecture) {
+       this.lecture = lecture;
+    }
+        
     public Event(Lecture lecture, int eventnr, Date datum) {
        this.lecture = lecture;
        this.eventnr = eventnr;
@@ -52,7 +57,7 @@ public class Event  implements java.io.Serializable {
         this.lid = lid;
     }
 
-@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
     public Lecture getLecture() {
         return this.lecture;
     }
@@ -72,7 +77,7 @@ public class Event  implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.DATE)
-    @Column(name="datum", nullable=false, length=10)
+    @Column(name="datum", length=10)
     public Date getDatum() {
         return this.datum;
     }

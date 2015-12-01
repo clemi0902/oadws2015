@@ -7,6 +7,8 @@ package gui;
 
 import intellicourse.entity.Room;
 import intellicourse.util.HibernateUtil;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 
 /**
@@ -14,7 +16,8 @@ import org.hibernate.Session;
  * @author Clemens
  */
 public class AddRoomDialog extends javax.swing.JDialog {
-
+    private boolean editMode = false;
+    private int rid = -1;
     /**
      * Creates new form AddRoomDialog
      */
@@ -77,7 +80,10 @@ public class AddRoomDialog extends javax.swing.JDialog {
     private void onOk(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onOk
         if (!tfName.getText().trim().equals("") && checkSeats())
         {
-            addRoom();
+            if (!editMode)
+                addRoom();
+            else
+                editRoom();
             this.dispose();
         }
 
@@ -87,6 +93,36 @@ public class AddRoomDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_onCancel
 
+    public void setEditMode()
+    {
+        editMode = true;
+    }   
+    
+    
+    private void editRoom()
+    {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        Room room = new Room(rid, tfName.getText(), Integer.parseInt(tfSeats.getText()));
+        session.update(room);
+//        String stmt = "UPDATE room set name = :name, anzSitzplatz = :anzSitzplatz "
+//                + "WHERE rid = :rid"; 
+//        Query query = session.createQuery(stmt);
+//        query.setParameter("roomName", tfName.getText());
+//        query.setParameter("seats", tfSeats.getText());
+//        query.setParameter("rid", rid);
+//        query.executeUpdate();
+        session.getTransaction().commit();
+        session.close();
+    }
+    
+    public void showRoom(Room room)
+    {
+        rid = room.getRid();
+        tfName.setText(room.getName());
+        tfSeats.setText(room.getAnzSitzplatz() + "");
+        System.out.println("warhiers");
+    }
     
     private void addRoom()
     {

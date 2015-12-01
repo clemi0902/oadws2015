@@ -9,16 +9,16 @@
             <generator class="identity" />
         </id>
         <property name="username" type="string">
-            <column name="username" length="30" not-null="true" />
+            <column name="username" length="30" not-null="false" />
         </property>
         <property name="password" type="string">
-            <column name="password" length="30" not-null="true" />
+            <column name="password" length="30" not-null="false" />
         </property>
         <property name="vorname" type="string">
-            <column name="vorname" length="50" not-null="true" />
+            <column name="vorname" length="50" not-null="false" />
         </property>
         <property name="nachname" type="string">
-            <column name="nachname" length="50" not-null="true" />
+            <column name="nachname" length="50" not-null="false" />
         </property>
         <one-to-one name="staff" class="intellicourse.entity.Staff"></one-to-one>
         <one-to-one name="admin" class="intellicourse.entity.Admin"></one-to-one>

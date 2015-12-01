@@ -14,6 +14,15 @@ public class StudentMenu extends javax.swing.JFrame {
     /**
      * Creates new form StudentMenu
      */
+    
+    
+     private int uid;
+    
+    public void setUid(int uid)
+    {
+        this.uid = uid;
+    }
+    
     public StudentMenu() {
         initComponents();
         this.setTitle("Student Menu");

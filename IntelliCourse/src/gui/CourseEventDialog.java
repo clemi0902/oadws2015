@@ -5,6 +5,21 @@
  */
 package gui;
 
+import intellicourse.entity.Lecture;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.BorderFactory;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 /**
  *
  * @author Clemens
@@ -17,7 +32,56 @@ public class CourseEventDialog extends javax.swing.JDialog {
     public CourseEventDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        tbAnzeigeCourse.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tfName.getDocument().addDocumentListener(new MyDocumentListener());
         this.setTitle("Course - Event Menu");
+        displayData();
+    }
+    
+    private void displayData() {
+        String sql;
+        sql = "select l.lid, l.name, l.beschreibung from Lecture as l "
+                + "WHERE UPPER(l.name) LIKE '" + tfName.getText().trim().toUpperCase() + "%'";
+        executeQuery(sql);
+    }
+
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            SQLQuery q = session.createSQLQuery(query);
+            q.addScalar("lid",new IntegerType());
+            q.addScalar("name",new StringType());
+            q.addScalar("beschreibung",new StringType());
+            q.setResultTransformer(Transformers.aliasToBean(Lecture.class));
+            List<Lecture> resultList = q.list();
+            displayResult(resultList);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void displayResult(List resultList) {
+        Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("Lid");
+        tableHead.add("Name");
+        tableHead.add("Beschreibung");
+        
+        for (Object o : resultList) {
+            Lecture lecture = new Lecture();
+            
+            Lecture l = (Lecture) o;
+            Vector<Object> row = new Vector<>();
+            row.add(l.getLid());
+            row.add(l.getName());
+            row.add(l.getBeschreibung());           
+            tableData.add(row);
+        }
+        tbAnzeigeCourse.setModel(new DefaultTableModel(tableData, tableHead));
+
     }
 
     /**
@@ -30,22 +94,22 @@ public class CourseEventDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tbAnzeigeCourse = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        tfName = new javax.swing.JTextField();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new CourseEventTableModel()
+        tbAnzeigeCourse.setModel(new CourseEventTableModel()
         );
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tbAnzeigeCourse);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -60,6 +124,11 @@ public class CourseEventDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setText("Delete");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onDelete(evt);
+            }
+        });
         jPanel1.add(jButton2);
 
         jButton3.setText("Edit");
@@ -80,8 +149,8 @@ public class CourseEventDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jButton5.setText("Filter");
-        getContentPane().add(jButton5, java.awt.BorderLayout.PAGE_START);
+        tfName.setBorder(BorderFactory.createTitledBorder("Filter Name"));
+        getContentPane().add(tfName, java.awt.BorderLayout.NORTH);
 
         jMenu1.setText("Options");
 
@@ -97,18 +166,62 @@ public class CourseEventDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         AddCourseDialog acd = new AddCourseDialog(null, rootPaneCheckingEnabled);
+        acd.setIsAdd(true);
         acd.setVisible(true);
+        displayData();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         AddCourseDialog acd = new AddCourseDialog(null, rootPaneCheckingEnabled);
         acd.setTitle("Edit Course/Event");
+        int rowindex = tbAnzeigeCourse.getSelectedRow();
+        int id = Integer.parseInt(tbAnzeigeCourse.getValueAt(rowindex, 0).toString());
+        String name = tbAnzeigeCourse.getValueAt(rowindex, 1).toString();
+        String beschriftung = tbAnzeigeCourse.getValueAt(rowindex, 2).toString();
+        Lecture lecture = new Lecture(id,name,beschriftung);
+        acd.setLecture(lecture);
+        acd.setIsAdd(false);
+        acd.fillFields();
         acd.setVisible(true);
+        displayData();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void onDelete(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onDelete
+        int selectedIndex = tbAnzeigeCourse.getSelectedRow();
+        if (selectedIndex >= 0)
+        {
+            String sql = null;
+        SQLQuery query = null;
+        try {
+            int lid = Integer.parseInt(tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 0).toString());
+            Lecture lecture = new Lecture(lid, tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 1).toString(), tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 2).toString());
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
+                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
+                query = session.createSQLQuery(sqlCourse);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlEvent);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlStudLect);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlLect);
+                query.executeUpdate(); 
+            
+
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        displayData();
+        }
+    }//GEN-LAST:event_onDelete
 
     /**
      * @param args the command line arguments
@@ -157,12 +270,32 @@ public class CourseEventDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tbAnzeigeCourse;
+    private javax.swing.JTextField tfName;
     // End of variables declaration//GEN-END:variables
+
+    private class MyDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            CourseEventDialog.this.displayData();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            CourseEventDialog.this.displayData();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            CourseEventDialog.this.displayData();
+        }
+
+        
+    }
 }

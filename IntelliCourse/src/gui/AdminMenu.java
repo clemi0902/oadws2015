@@ -13,6 +13,14 @@ import javax.swing.table.TableModel;
  */
 public class AdminMenu extends javax.swing.JFrame {
 
+    
+    
+     private int uid;
+    
+    public void setUid(int uid)
+    {
+        this.uid = uid;
+    }
     /**
      * Creates new form NewJFrame
      */

@@ -9,34 +9,34 @@
             <generator class="identity" />
         </id>
         <many-to-one name="room" class="intellicourse.entity.Room" fetch="select">
-            <column name="rid" not-null="true" />
+            <column name="rid" not-null="false" />
         </many-to-one>
         <many-to-one name="staff" class="intellicourse.entity.Staff" fetch="select">
-            <column name="uid" not-null="true" />
+            <column name="uid" not-null="false" />
         </many-to-one>
         <property name="name" type="string">
-            <column name="name" length="50" not-null="true" />
+            <column name="name" length="50" not-null="false" />
         </property>
         <property name="beschreibung" type="string">
-            <column name="beschreibung" length="65535" not-null="true" />
+            <column name="beschreibung" length="65535" not-null="false" />
         </property>
         <property name="von" type="time">
-            <column name="von" length="8" not-null="true" />
+            <column name="von" length="8" not-null="false" />
         </property>
         <property name="bis" type="time">
-            <column name="bis" length="8" not-null="true" />
+            <column name="bis" length="8" not-null="false" />
         </property>
         <property name="preference" type="int">
-            <column name="preference" not-null="true" />
+            <column name="preference" not-null="false" />
         </property>
         <one-to-one name="event" cascade="delete" class="intellicourse.entity.Event"></one-to-one>
         <one-to-one name="course" cascade="delete" class="intellicourse.entity.Course"></one-to-one>
-        <set name="students" cascade="all" table="student_lecture" inverse="false" lazy="true" fetch="select">
+        <set name="students" table="student_lecture" inverse="false" lazy="true" fetch="select">
             <key>
-                <column name="lid" not-null="true" />
+                <column name="lid" not-null="false" />
             </key>
             <many-to-many entity-name="intellicourse.entity.Student">
-                <column name="uid" not-null="true" />
+                <column name="uid" not-null="false" />
             </many-to-many>
         </set>
     </class>

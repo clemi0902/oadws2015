@@ -4,6 +4,7 @@ package intellicourse.entity;
 
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -63,7 +64,7 @@ public class Student  implements java.io.Serializable {
         this.uid = uid;
     }
 
-@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
     public User getUser() {
         return this.user;
     }
@@ -102,7 +103,7 @@ public class Student  implements java.io.Serializable {
         this.aktSemester = aktSemester;
     }
 
-@ManyToMany(fetch=FetchType.LAZY, mappedBy="students")
+@ManyToMany(fetch=FetchType.LAZY, cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST}, mappedBy="students")
     public Set getLectures() {
         return this.lectures;
     }

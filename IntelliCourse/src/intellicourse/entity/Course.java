@@ -35,6 +35,9 @@ public class Course  implements java.io.Serializable {
     public Course() {
     }
 
+    public Course(Lecture lecture) {
+       this.lecture = lecture;
+    }
     public Course(Lecture lecture, int kursnr, Date startDat, Date endDat) {
        this.lecture = lecture;
        this.kursnr = kursnr;
@@ -54,7 +57,7 @@ public class Course  implements java.io.Serializable {
         this.lid = lid;
     }
 
-@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
     public Lecture getLecture() {
         return this.lecture;
     }
@@ -64,7 +67,7 @@ public class Course  implements java.io.Serializable {
     }
 
     
-    @Column(name="kursnr", nullable=false)
+    @Column(name="kursnr", nullable=true)
     public int getKursnr() {
         return this.kursnr;
     }
@@ -74,7 +77,7 @@ public class Course  implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.DATE)
-    @Column(name="startDat", nullable=false, length=10)
+    @Column(name="startDat", length=10)
     public Date getStartDat() {
         return this.startDat;
     }
@@ -84,7 +87,7 @@ public class Course  implements java.io.Serializable {
     }
 
     @Temporal(TemporalType.DATE)
-    @Column(name="endDat", nullable=false, length=10)
+    @Column(name="endDat", length=10)
     public Date getEndDat() {
         return this.endDat;
     }

@@ -54,7 +54,7 @@ public class Staff  implements java.io.Serializable {
         this.uid = uid;
     }
 
-@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
     public User getUser() {
         return this.user;
     }

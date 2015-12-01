@@ -33,6 +33,12 @@ public class Room  implements java.io.Serializable {
     }
 
 	
+    public Room(Integer rid, String name, int anzSitzplatz) {
+        this.rid = rid;
+        this.name = name;
+        this.anzSitzplatz = anzSitzplatz;
+    }
+    
     public Room(String name, int anzSitzplatz) {
         this.name = name;
         this.anzSitzplatz = anzSitzplatz;
@@ -46,7 +52,7 @@ public class Room  implements java.io.Serializable {
      @Id @GeneratedValue(strategy=IDENTITY)
 
     
-    @Column(name="rid", unique=true, nullable=false)
+    @Column(name="rid", unique=true)
     public Integer getRid() {
         return this.rid;
     }
@@ -56,7 +62,7 @@ public class Room  implements java.io.Serializable {
     }
 
     
-    @Column(name="name", nullable=false, length=50)
+    @Column(name="name", length=50)
     public String getName() {
         return this.name;
     }
@@ -66,7 +72,7 @@ public class Room  implements java.io.Serializable {
     }
 
     
-    @Column(name="anzSitzplatz", nullable=false)
+    @Column(name="anzSitzplatz")
     public int getAnzSitzplatz() {
         return this.anzSitzplatz;
     }
@@ -75,7 +81,7 @@ public class Room  implements java.io.Serializable {
         this.anzSitzplatz = anzSitzplatz;
     }
 
-@OneToMany(cascade = CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="room")
+@OneToMany(fetch=FetchType.LAZY, mappedBy="room")
     public Set getLectures() {
         return this.lectures;
     }

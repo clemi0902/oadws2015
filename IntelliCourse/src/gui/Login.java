@@ -23,6 +23,7 @@ import org.hibernate.Session;
  */
 public class Login extends javax.swing.JFrame {
 
+    private int uid;
     /**
      * Creates new form Login
      */
@@ -127,6 +128,7 @@ public class Login extends javax.swing.JFrame {
             case 0:
                 if (checkStudentLogin()) {
                     StudentMenu sm = new StudentMenu();
+                    sm.setUid(uid);
                     sm.setVisible(true);
                     this.dispose();
                 } else {
@@ -137,6 +139,7 @@ public class Login extends javax.swing.JFrame {
             case 1:
                 if (checkStaffLogin()) {
                     TeacherMenu tm = new TeacherMenu();
+                    tm.setUid(uid);
                     tm.setVisible(true);
                     this.dispose();
                 } else {
@@ -147,6 +150,7 @@ public class Login extends javax.swing.JFrame {
             case 2:
                 if (checkAdminLogin()) {
                     AdminMenu am = new AdminMenu();
+                    am.setUid(uid);
                     am.setVisible(true);
                     this.dispose();
                 } else {
@@ -159,7 +163,7 @@ public class Login extends javax.swing.JFrame {
     private boolean checkAdminLogin() {
         List resultList = null;
         try {
-            String query = "from Admin a "
+            String query = "SELECT a.uid from Admin a "
                     + "WHERE a.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
                     + "AND password LIKE '" + tfPassword.getText() + "')";
@@ -174,6 +178,7 @@ public class Login extends javax.swing.JFrame {
         if (resultList.isEmpty()) {
             return false;
         } else {
+            uid = (int) resultList.get(0);
             return true;
         }
     }

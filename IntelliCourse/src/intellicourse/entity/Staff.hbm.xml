@@ -13,7 +13,7 @@
         <one-to-one name="user" class="intellicourse.entity.User" constrained="true"></one-to-one>
         <set name="lectures" table="lecture" inverse="true" lazy="true" fetch="select">
             <key>
-                <column name="uid" not-null="true" />
+                <column name="uid" not-null="false" />
             </key>
             <one-to-many class="intellicourse.entity.Lecture" />
         </set>

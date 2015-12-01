@@ -11,6 +11,12 @@ package gui;
  */
 public class TeacherMenu extends javax.swing.JFrame {
 
+    private int uid;
+    
+    public void setUid(int uid)
+    {
+        this.uid = uid;
+    }
     /**
      * Creates new form TeacherMenu
      */

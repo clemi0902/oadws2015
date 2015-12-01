@@ -12,10 +12,10 @@
         </id>
         <one-to-one name="lecture" class="intellicourse.entity.Lecture" constrained="true"></one-to-one>
         <property name="eventnr" type="int">
-            <column name="eventnr" not-null="true" />
+            <column name="eventnr" not-null="false" />
         </property>
         <property name="datum" type="date">
-            <column name="datum" length="10" not-null="true" />
+            <column name="datum" length="10" not-null="false" />
         </property>
     </class>
 </hibernate-mapping>
