@@ -343,10 +343,12 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         }
         session.getTransaction().commit();
         session.close();
+        cdd.dispose();
         this.dispose();
     }//GEN-LAST:event_btOkActionPerformed
 
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelActionPerformed
+        cdd.dispose();
         this.dispose();
     }//GEN-LAST:event_btCancelActionPerformed
 

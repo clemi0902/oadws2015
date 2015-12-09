@@ -319,11 +319,12 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         }
         session.getTransaction().commit();
         session.close();
-
+        cdd.dispose();
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        cdd.dispose();
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 

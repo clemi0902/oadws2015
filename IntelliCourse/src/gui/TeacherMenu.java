@@ -84,8 +84,8 @@ public class TeacherMenu extends javax.swing.JFrame {
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jMenu1.setText("Log out");
-        jMenu1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 onLogOut(evt);
             }
         });
@@ -103,8 +103,8 @@ public class TeacherMenu extends javax.swing.JFrame {
         apd.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void onLogOut(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onLogOut
-       System.exit(0);
+    private void onLogOut(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_onLogOut
+        System.exit(0);
     }//GEN-LAST:event_onLogOut
 
     /**

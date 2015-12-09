@@ -160,8 +160,8 @@ public class StudentMenu extends javax.swing.JFrame {
         getContentPane().add(jButton2, java.awt.BorderLayout.SOUTH);
 
         jMenu1.setText("Log out");
-        jMenu1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 onLogOut(evt);
             }
         });
@@ -177,10 +177,6 @@ public class StudentMenu extends javax.swing.JFrame {
         std.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void onLogOut(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onLogOut
-        System.exit(0);
-    }//GEN-LAST:event_onLogOut
-
     private void btRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegisterActionPerformed
         int[] indeces = tbLectures.getSelectedRows();
         for(int i : indeces)
@@ -195,6 +191,10 @@ public class StudentMenu extends javax.swing.JFrame {
         unregister(index);
         displayRegistered();
     }//GEN-LAST:event_btUnregisterActionPerformed
+
+    private void onLogOut(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_onLogOut
+        System.exit(0);
+    }//GEN-LAST:event_onLogOut
 
     private void unregister(int index)
     {
