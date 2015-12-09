@@ -89,7 +89,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="jButton6">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Change Curricula"/>
+            <Property name="text" type="java.lang.String" value="Curricula"/>
           </Properties>
         </Component>
       </SubComponents>

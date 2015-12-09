@@ -5,23 +5,20 @@
  */
 package gui;
 
-import java.awt.Image;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.SpinnerDateModel;
+import javax.swing.BorderFactory;
 
 /**
  *
  * @author Clemens
  */
-public class BookingsOverview extends javax.swing.JDialog {
+public class CurriculaDialog extends javax.swing.JDialog {
 
     /**
-     * Creates new form BookingsOverview
+     * Creates new form CurriculaDialog
      */
-    public BookingsOverview(java.awt.Frame parent, boolean modal) {
+    public CurriculaDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        this.setTitle("Curricula");
         initComponents();
     }
 
@@ -36,29 +33,48 @@ public class BookingsOverview extends javax.swing.JDialog {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jTextField1 = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jSpinner1 = new javax.swing.JSpinner(new SpinnerDateModel());
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {0, "SEW"},
+                {1, "Informatik"},
+                {2, "Telematik"},
+                {3, "Psychologie"}
+            },
+            new String [] {
+                "Curriculum ID", "Curriculum Name"
+            }
+        ));
         jScrollPane1.setViewportView(jTable1);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        jTextField1.setBorder(BorderFactory.createTitledBorder("Filter Curricula"));
+        getContentPane().add(jTextField1, java.awt.BorderLayout.PAGE_START);
 
-        try{
-            Image img = ImageIO.read(getClass().getResource("../resources/calendar-icon.png"));
-            Image resizedImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-            jButton2.setIcon(new ImageIcon(resizedImage));
-        }catch(IOException ex)
-        {
-        }
-        jPanel1.add(jButton2, java.awt.BorderLayout.EAST);
-        jPanel1.add(jSpinner1, java.awt.BorderLayout.CENTER);
+        jPanel1.setLayout(new java.awt.GridLayout());
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_START);
+        jButton1.setText("Add");
+        jPanel1.add(jButton1);
+
+        jButton2.setText("Remove");
+        jPanel1.add(jButton2);
+
+        jButton3.setText("Edit");
+        jPanel1.add(jButton3);
+
+        jButton4.setText("Ok");
+        jPanel1.add(jButton4);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -80,20 +96,20 @@ public class BookingsOverview extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(BookingsOverview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CurriculaDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(BookingsOverview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CurriculaDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(BookingsOverview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CurriculaDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(BookingsOverview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(CurriculaDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                BookingsOverview dialog = new BookingsOverview(new javax.swing.JFrame(), true);
+                CurriculaDialog dialog = new CurriculaDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -106,10 +122,13 @@ public class BookingsOverview extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }

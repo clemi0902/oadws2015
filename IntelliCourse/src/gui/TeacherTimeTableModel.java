@@ -34,7 +34,7 @@ public class TeacherTimeTableModel extends AbstractTableModel{
     
     @Override
     public int getRowCount() {
-        return 24;
+        return 15*4;
     }
 
     @Override

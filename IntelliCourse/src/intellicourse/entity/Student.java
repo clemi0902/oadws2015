@@ -1,10 +1,9 @@
 package intellicourse.entity;
-// Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1
+// Generated 08.12.2015 10:38:01 by Hibernate Tools 4.3.1
 
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -64,7 +63,7 @@ public class Student  implements java.io.Serializable {
         this.uid = uid;
     }
 
-@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
     public User getUser() {
         return this.user;
     }
@@ -103,7 +102,7 @@ public class Student  implements java.io.Serializable {
         this.aktSemester = aktSemester;
     }
 
-@ManyToMany(fetch=FetchType.LAZY, cascade={CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST}, mappedBy="students")
+@ManyToMany(fetch=FetchType.LAZY, mappedBy="students")
     public Set getLectures() {
         return this.lectures;
     }

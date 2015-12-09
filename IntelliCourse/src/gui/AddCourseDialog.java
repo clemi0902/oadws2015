@@ -237,7 +237,6 @@ public class AddCourseDialog extends javax.swing.JDialog {
             session.update(lecture2);
             session.getTransaction().commit();
             session.close();
-            JOptionPane.showMessageDialog(null, "Data updated succesfully !");
                   
              
         }catch(Exception e){

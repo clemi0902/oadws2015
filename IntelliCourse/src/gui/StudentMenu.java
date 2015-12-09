@@ -5,6 +5,24 @@
  */
 package gui;
 
+import intellicourse.entity.Lecture;
+import intellicourse.entity.Room;
+import intellicourse.util.HibernateUtil;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+import javafx.scene.control.SelectionMode;
+import javax.swing.BorderFactory;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+
 /**
  *
  * @author Clemens
@@ -14,17 +32,21 @@ public class StudentMenu extends javax.swing.JFrame {
     /**
      * Creates new form StudentMenu
      */
-    
-    
-     private int uid;
-    
-    public void setUid(int uid)
-    {
+    private int uid;
+
+    public void setUid(int uid) {
         this.uid = uid;
+        displayRegistered();
     }
-    
+
     public StudentMenu() {
         initComponents();
+        tbRegistered.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tfName.getDocument().addDocumentListener(new TfChangeListener());
+        cbCourse.addActionListener(new MyCbChangeListener());
+        cbEvent.addActionListener(new MyCbChangeListener());
+        displayLectures();
+        
         this.setTitle("Student Menu");
     }
 
@@ -36,46 +58,98 @@ public class StudentMenu extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanel5 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tbLectures = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        tfName = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
+        cbCourse = new javax.swing.JCheckBox();
+        cbEvent = new javax.swing.JCheckBox();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tbRegistered = new javax.swing.JTable();
+        jPanel6 = new javax.swing.JPanel();
+        btRegister = new javax.swing.JButton();
+        btUnregister = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Course Name", "Teacher", "Date", "From - To"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        jPanel5.setLayout(new java.awt.BorderLayout());
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jScrollPane1.setViewportView(tbLectures);
+
+        jPanel5.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel5.add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jButton1.setText("Enroll to Course");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jPanel2.setLayout(new java.awt.GridLayout());
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+        jPanel4.add(tfName, java.awt.BorderLayout.CENTER);
+
+        jPanel4.setBorder(BorderFactory.createTitledBorder("Filter Name"));
+
+        jPanel2.add(jPanel4);
+
+        jPanel3.setLayout(new java.awt.GridLayout(2, 0));
+
+        cbCourse.setSelected(true);
+        cbCourse.setText("Course");
+        jPanel3.add(cbCourse);
+
+        cbEvent.setSelected(true);
+        cbEvent.setText("Event");
+        jPanel3.add(cbEvent);
+
+        jPanel2.add(jPanel3);
+
+        jPanel5.add(jPanel2, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel5, java.awt.BorderLayout.EAST);
+
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane2.setViewportView(tbRegistered);
+
+        jPanel7.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel7, java.awt.BorderLayout.WEST);
+
+        jPanel6.setLayout(new java.awt.GridBagLayout());
+
+        btRegister.setText("Register");
+        btRegister.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btRegisterActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(9, 0, 9, 0);
+        jPanel6.add(btRegister, gridBagConstraints);
 
-        jButton4.setText("Unregister");
-        jPanel1.add(jButton4);
+        btUnregister.setText("Unregister");
+        btUnregister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btUnregisterActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(9, 0, 9, 0);
+        jPanel6.add(btUnregister, gridBagConstraints);
+
+        getContentPane().add(jPanel6, java.awt.BorderLayout.CENTER);
 
         jButton2.setText("Show Timetable");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -83,14 +157,14 @@ public class StudentMenu extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton2);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
-
-        jButton3.setText("Filter");
-        getContentPane().add(jButton3, java.awt.BorderLayout.PAGE_START);
+        getContentPane().add(jButton2, java.awt.BorderLayout.SOUTH);
 
         jMenu1.setText("Log out");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onLogOut(evt);
+            }
+        });
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -98,15 +172,172 @@ public class StudentMenu extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        EnrollCourseDialog ecd = new EnrollCourseDialog(this, rootPaneCheckingEnabled);
-        ecd.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         StudentTimetableDialog std = new StudentTimetableDialog(this, rootPaneCheckingEnabled);
         std.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void onLogOut(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onLogOut
+        System.exit(0);
+    }//GEN-LAST:event_onLogOut
+
+    private void btRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegisterActionPerformed
+        int[] indeces = tbLectures.getSelectedRows();
+        for(int i : indeces)
+        {
+            register(i);
+        }
+        displayRegistered();
+    }//GEN-LAST:event_btRegisterActionPerformed
+
+    private void btUnregisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btUnregisterActionPerformed
+        int index = tbRegistered.getSelectedRow();
+        unregister(index);
+        displayRegistered();
+    }//GEN-LAST:event_btUnregisterActionPerformed
+
+    private void unregister(int index)
+    {
+        int lid = Integer.parseInt(tbRegistered.getValueAt(index, 0).toString());
+        String query = "DELETE FROM student_lecture "
+                + "WHERE lid = " + lid +" AND "
+                + "uid = " + uid;
+        
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+                SQLQuery q = session.createSQLQuery(query);
+                q.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void register(int index)
+    {
+        int lid = Integer.parseInt(tbLectures.getValueAt(index, 0).toString());
+        String query = "INSERT IGNORE INTO student_lecture "
+                + "VALUES("+lid+","+uid+")";
+        
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+                SQLQuery q = session.createSQLQuery(query);
+                q.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void displayRegistered()
+    {
+        String QUERY = "SELECT l.lid as lectid, l.name as lectname, l.beschreibung as lectbe  FROM lecture l INNER JOIN student_lecture sl USING(lid) "
+                + "WHERE sl.uid = " + uid;
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            List<Object> resultList = null;
+            if (!QUERY.equals("")) {
+                SQLQuery q = session.createSQLQuery(QUERY);
+                resultList = (List<Object>) q.list();
+            }
+            session.getTransaction().commit();
+            session.close();
+            Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("LID");
+        tableHead.add("Name");
+        tableHead.add("Beschreibung");
+        if (resultList != null) {
+            Iterator itr = resultList.iterator();
+            while (itr.hasNext()) {
+                Vector<Object> row = new Vector();
+                Object[] o = (Object[]) itr.next();
+                row.add(Integer.parseInt(String.valueOf(o[0])));
+                row.add(String.valueOf(o[1]));
+                row.add(String.valueOf(o[2]));
+                tableData.add(row);
+            }
+        }
+        tbRegistered.setModel(new DefaultTableModel(tableData, tableHead));
+        
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void displayLectures() {
+        String QUERY = "";
+        if (cbCourse.isSelected() && cbEvent.isSelected()) {
+            QUERY = "SELECT * FROM lecture "
+                    + "WHERE preference = 0 AND "
+                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+        } else if (cbCourse.isSelected() && !cbEvent.isSelected()) {
+            QUERY = "SELECT * FROM lecture "
+                    + "INNER JOIN course USING(lid) "
+                    + "WHERE preference = 0 AND "
+                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+        } else if (!cbCourse.isSelected() && cbEvent.isSelected()) {
+            QUERY = "SELECT * FROM lecture "
+                    + "INNER JOIN event USING(lid) "
+                    + "WHERE preference = 0 AND "
+                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+        }
+        executeQuery(QUERY);
+
+    }
+
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            List<Object> resultList = null;
+            if (!query.equals("")) {
+                SQLQuery q = session.createSQLQuery(query);
+                resultList = (List<Object>) q.list();
+            }
+            displayResult(resultList);
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void displayResult(List<Object> resultList) {
+        Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("LID");
+        tableHead.add("Name");
+        tableHead.add("Beschreibung");
+        if (resultList != null) {
+            Iterator itr = resultList.iterator();
+            while (itr.hasNext()) {
+                Vector<Object> row = new Vector();
+                Object[] o = (Object[]) itr.next();
+                row.add(Integer.parseInt(String.valueOf(o[0])));
+                row.add(String.valueOf(o[1]));
+                row.add(String.valueOf(o[2]));
+                tableData.add(row);
+            }
+        }
+//        for (Object o : resultList) {
+//            Lecture l = (Lecture) o;
+//            
+//            Vector<Object> row = new Vector<>();
+//            row.add(l.getLid());
+//            row.add(l.getName());
+//            row.add(l.getBeschreibung());
+//            tableData.add(row);
+//        }
+        tbLectures.setModel(new DefaultTableModel(tableData, tableHead));
+
+    }
 
     /**
      * @param args the command line arguments
@@ -144,14 +375,60 @@ public class StudentMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btRegister;
+    private javax.swing.JButton btUnregister;
+    private javax.swing.JCheckBox cbCourse;
+    private javax.swing.JCheckBox cbEvent;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tbLectures;
+    private javax.swing.JTable tbRegistered;
+    private javax.swing.JTextField tfName;
     // End of variables declaration//GEN-END:variables
+
+    private class TfChangeListener implements DocumentListener {
+
+        public TfChangeListener() {
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            onChange();
+        }
+
+        private void onChange() {
+            StudentMenu.this.displayLectures();
+        }
+    }
+
+    private class MyCbChangeListener implements ActionListener {
+
+        public MyCbChangeListener() {
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            StudentMenu.this.displayLectures();
+        }
+    }
 }

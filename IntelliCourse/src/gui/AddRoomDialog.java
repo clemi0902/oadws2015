@@ -84,12 +84,14 @@ public class AddRoomDialog extends javax.swing.JDialog {
                 addRoom();
             else
                 editRoom();
+            this.setVisible(false);
             this.dispose();
         }
 
     }//GEN-LAST:event_onOk
 
     private void onCancel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onCancel
+        this.setVisible(false);
         this.dispose();
     }//GEN-LAST:event_onCancel
 
@@ -121,7 +123,6 @@ public class AddRoomDialog extends javax.swing.JDialog {
         rid = room.getRid();
         tfName.setText(room.getName());
         tfSeats.setText(room.getAnzSitzplatz() + "");
-        System.out.println("warhiers");
     }
     
     private void addRoom()

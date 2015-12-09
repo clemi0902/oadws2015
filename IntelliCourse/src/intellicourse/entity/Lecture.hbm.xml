@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1 -->
+<!-- Generated 08.12.2015 10:38:02 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
     <class name="intellicourse.entity.Lecture" table="lecture" catalog="oad_db" optimistic-lock="version">
         <id name="lid" type="java.lang.Integer">
@@ -9,34 +9,39 @@
             <generator class="identity" />
         </id>
         <many-to-one name="room" class="intellicourse.entity.Room" fetch="select">
-            <column name="rid" not-null="false" />
+            <column name="rid" />
         </many-to-one>
         <many-to-one name="staff" class="intellicourse.entity.Staff" fetch="select">
-            <column name="uid" not-null="false" />
+            <column name="uid" />
         </many-to-one>
         <property name="name" type="string">
-            <column name="name" length="50" not-null="false" />
+            <column name="name" length="50" not-null="true" />
         </property>
         <property name="beschreibung" type="string">
-            <column name="beschreibung" length="65535" not-null="false" />
+            <column name="beschreibung" length="65535" not-null="true" />
         </property>
-        <property name="von" type="time">
-            <column name="von" length="8" not-null="false" />
+        <property name="preference" type="java.lang.Integer">
+            <column name="preference" />
         </property>
-        <property name="bis" type="time">
-            <column name="bis" length="8" not-null="false" />
+        <property name="priority" type="java.lang.Integer">
+            <column name="priority" />
         </property>
-        <property name="preference" type="int">
-            <column name="preference" not-null="false" />
-        </property>
-        <one-to-one name="event" cascade="delete" class="intellicourse.entity.Event"></one-to-one>
-        <one-to-one name="course" cascade="delete" class="intellicourse.entity.Course"></one-to-one>
+        <one-to-one name="event" class="intellicourse.entity.Event"></one-to-one>
+        <one-to-one name="course" class="intellicourse.entity.Course"></one-to-one>
         <set name="students" table="student_lecture" inverse="false" lazy="true" fetch="select">
             <key>
-                <column name="lid" not-null="false" />
+                <column name="lid" not-null="true" />
             </key>
             <many-to-many entity-name="intellicourse.entity.Student">
-                <column name="uid" not-null="false" />
+                <column name="uid" not-null="true" />
+            </many-to-many>
+        </set>
+        <set name="curriculums" table="curriculum_lecture" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="lid" not-null="true" />
+            </key>
+            <many-to-many entity-name="intellicourse.entity.Curriculum">
+                <column name="cid" not-null="true" />
             </many-to-many>
         </set>
     </class>

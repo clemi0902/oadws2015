@@ -89,7 +89,7 @@ public class AdminMenu extends javax.swing.JFrame {
         jButton5.setText("Show/Adapt Schedule");
         jPanel1.add(jButton5);
 
-        jButton6.setText("Change Curricula");
+        jButton6.setText("Curricula");
         jPanel1.add(jButton6);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);

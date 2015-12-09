@@ -84,6 +84,11 @@ public class TeacherMenu extends javax.swing.JFrame {
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jMenu1.setText("Log out");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onLogOut(evt);
+            }
+        });
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -94,8 +99,13 @@ public class TeacherMenu extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         AddPreferenceDialog apd = new AddPreferenceDialog(this, rootPaneCheckingEnabled);
+        apd.setUid(uid);
         apd.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void onLogOut(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onLogOut
+       System.exit(0);
+    }//GEN-LAST:event_onLogOut
 
     /**
      * @param args the command line arguments

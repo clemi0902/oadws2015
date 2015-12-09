@@ -1,5 +1,5 @@
 package intellicourse.entity;
-// Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1
+// Generated 08.12.2015 10:38:01 by Hibernate Tools 4.3.1
 
 
 import javax.persistence.Column;
@@ -45,7 +45,7 @@ public class Admin  implements java.io.Serializable {
         this.uid = uid;
     }
 
-@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
     public User getUser() {
         return this.user;
     }

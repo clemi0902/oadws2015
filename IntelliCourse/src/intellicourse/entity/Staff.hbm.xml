@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1 -->
+<!-- Generated 08.12.2015 10:38:02 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
     <class name="intellicourse.entity.Staff" table="staff" catalog="oad_db" optimistic-lock="version">
         <id name="uid" type="int">
@@ -13,7 +13,7 @@
         <one-to-one name="user" class="intellicourse.entity.User" constrained="true"></one-to-one>
         <set name="lectures" table="lecture" inverse="true" lazy="true" fetch="select">
             <key>
-                <column name="uid" not-null="false" />
+                <column name="uid" />
             </key>
             <one-to-many class="intellicourse.entity.Lecture" />
         </set>

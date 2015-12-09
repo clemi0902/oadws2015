@@ -1,5 +1,5 @@
 package intellicourse.entity;
-// Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1
+// Generated 08.12.2015 10:38:01 by Hibernate Tools 4.3.1
 
 
 import javax.persistence.Column;
@@ -33,15 +33,16 @@ public class User  implements java.io.Serializable {
     public User() {
     }
 
-	
-    public User(Integer uid, String username, String password, String vorname, String nachname) {
+    
+    public User(Integer uid, String username, String password, String vorname, String nachame)
+    {
         this.uid = uid;
         this.username = username;
         this.password = password;
         this.vorname = vorname;
         this.nachname = nachname;
     }
-    
+	
     public User(String username, String password, String vorname, String nachname) {
         this.username = username;
         this.password = password;

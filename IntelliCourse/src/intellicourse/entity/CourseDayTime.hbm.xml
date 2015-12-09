@@ -3,19 +3,16 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 08.12.2015 10:38:02 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="intellicourse.entity.Event" table="event" catalog="oad_db" optimistic-lock="version">
+    <class name="intellicourse.entity.CourseDayTime" table="course_day_time" catalog="oad_db" optimistic-lock="version">
         <id name="lid" type="int">
             <column name="lid" />
             <generator class="foreign">
-                <param name="property">lecture</param>
+                <param name="property">course</param>
             </generator>
         </id>
-        <one-to-one name="lecture" class="intellicourse.entity.Lecture" constrained="true"></one-to-one>
-        <property name="eventnr" type="java.lang.Integer">
-            <column name="eventnr" />
-        </property>
-        <property name="datum" type="date">
-            <column name="datum" length="10" />
+        <one-to-one name="course" class="intellicourse.entity.Course" constrained="true"></one-to-one>
+        <property name="day" type="date">
+            <column name="day" length="10" />
         </property>
         <property name="von" type="time">
             <column name="von" length="8" />

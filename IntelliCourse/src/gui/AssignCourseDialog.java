@@ -5,30 +5,73 @@
  */
 package gui;
 
-import java.awt.Image;
-import java.awt.Window;
-import java.io.IOException;
+import intellicourse.entity.Event;
+import intellicourse.entity.Lecture;
+import intellicourse.entity.Room;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
-import javax.swing.SwingUtilities;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 
 /**
  *
  * @author Clemens
  */
 public class AssignCourseDialog extends javax.swing.JDialog {
+    private CourseDayDialog cdd = new CourseDayDialog(null, true);
+    private Properties p = new Properties();
+    private User staff = null;
+    private Lecture lecture = null;
+    private Room room = null;
+    boolean isCourse = true;
+    private Object[][] data ={ 
+    {"Monday", "08:00", "08:00", false},
+    {"Tuesday", "08:00", "08:00", false},
+    {"Wednesday", "08:00", "08:00", false},
+    {"Thursday", "08:00", "08:00", false},
+    {"Friday", "08:00", "08:00", false},
+    {"Saturday", "08:00", "08:00", false},
+    {"Sunday", "08:00", "08:00", false}};
 
+    
+    
     /**
      * Creates new form AddCourseEventDialog
      */
     public AssignCourseDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-
-        
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        this.setModalityType(ModalityType.MODELESS);
+        cdd.setModalityType(ModalityType.MODELESS);
+        cdd.setData(data);
         initComponents();
+        this.setLocationRelativeTo(null);
+        changeGUI();
+        rbCourse.addActionListener(new MyActionListener());
+        rbEvent.addActionListener(new MyActionListener());
         this.setTitle("Assign Courses");
     }
 
@@ -41,24 +84,32 @@ public class AssignCourseDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgCourseEvent = new javax.swing.ButtonGroup();
         jPanel4 = new javax.swing.JPanel();
+        btShowPreferences = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
+        rbCourse = new javax.swing.JRadioButton();
+        rbEvent = new javax.swing.JRadioButton();
+        jLabel2 = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        tfLecture = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
-        jButton2 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
+        tfTeacher = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         btOk = new javax.swing.JButton();
         btCancel = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
-        jComboBox2 = new javax.swing.JComboBox();
-        jButton3 = new javax.swing.JButton();
+        tfRoom = new javax.swing.JTextField();
+        jButton5 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        jPanel8 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         timeSpinner = new javax.swing.JSpinner(new SpinnerDateModel());
         jLabel5 = new javax.swing.JLabel();
@@ -68,19 +119,64 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jPanel5.setLayout(new java.awt.GridLayout(2, 2));
+        btShowPreferences.setText("Show Teacher Preferences");
+        btShowPreferences.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btShowPreferencesActionPerformed(evt);
+            }
+        });
+        jPanel4.add(btShowPreferences, java.awt.BorderLayout.SOUTH);
+
+        jPanel5.setLayout(new java.awt.GridLayout(3, 2));
+
+        bgCourseEvent.add(rbCourse);
+        rbCourse.setSelected(true);
+        rbCourse.setText("Course");
+        rbCourse.setActionCommand("Course");
+        jPanel5.add(rbCourse);
+
+        bgCourseEvent.add(rbEvent);
+        rbEvent.setText("Event");
+        rbEvent.setActionCommand("Event");
+        jPanel5.add(rbEvent);
+
+        jLabel2.setText("Course/Event:");
+        jPanel5.add(jLabel2);
+
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        tfLecture.setEnabled(false);
+        tfLecture.setFocusable(false);
+        jPanel9.add(tfLecture, java.awt.BorderLayout.CENTER);
+
+        jButton3.setText("...");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel9.add(jButton3, java.awt.BorderLayout.LINE_END);
+
+        jPanel5.add(jPanel9);
 
         jLabel1.setText("Teacher:");
         jPanel5.add(jLabel1);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel5.add(jComboBox1);
+        jPanel7.setLayout(new java.awt.BorderLayout());
 
-        jButton2.setText("Show Teacher Preferences");
-        jPanel5.add(jButton2);
+        tfTeacher.setEnabled(false);
+        tfTeacher.setFocusable(false);
+        jPanel7.add(tfTeacher, java.awt.BorderLayout.CENTER);
 
-        jButton4.setText("Show Bookings");
-        jPanel5.add(jButton4);
+        jButton1.setText("...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel7.add(jButton1, java.awt.BorderLayout.LINE_END);
+
+        jPanel5.add(jPanel7);
 
         jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
 
@@ -106,44 +202,50 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setLayout(new java.awt.GridLayout(4, 2));
+        jPanel2.setLayout(new java.awt.GridLayout(5, 2));
 
         jLabel7.setText("Room:");
         jPanel2.add(jLabel7);
 
         jPanel6.setLayout(new java.awt.BorderLayout());
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        jPanel6.add(jComboBox2, java.awt.BorderLayout.CENTER);
+        tfRoom.setEnabled(false);
+        tfRoom.setFocusable(false);
+        jPanel6.add(tfRoom, java.awt.BorderLayout.CENTER);
 
-        jButton3.setText("Details");
-        jPanel6.add(jButton3, java.awt.BorderLayout.LINE_END);
+        jButton5.setText("...");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel6.add(jButton5, java.awt.BorderLayout.LINE_END);
 
         jPanel2.add(jPanel6);
 
-        jLabel3.setText("Date/Day of Week:");
+        jLabel3.setText("Start Date");
         jPanel2.add(jLabel3);
+
+        jLabel6.setText("End Date");
+        jPanel2.add(jLabel6);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        try{
-            Image img = ImageIO.read(getClass().getResource("../resources/calendar-icon.png"));
-            Image resizedImage = img.getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
-            jButton1.setIcon(new ImageIcon(resizedImage));
-        }catch(IOException ex)
-        {
-        }
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                onShowCalendar(evt);
-            }
-        });
-        jPanel3.add(jButton1, java.awt.BorderLayout.LINE_END);
-
-        jTextField2.setEditable(false);
-        jPanel3.add(jTextField2, java.awt.BorderLayout.CENTER);
+        UtilDateModel model = new UtilDateModel();
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        jPanel3.add(datePicker);
 
         jPanel2.add(jPanel3);
+
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        UtilDateModel model2 = new UtilDateModel();
+        JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p);
+        JDatePickerImpl datePicker2 = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
+        jPanel8.add(datePicker2);
+
+        jPanel2.add(jPanel8);
 
         jLabel4.setText("Start Time:");
         jPanel2.add(jLabel4);
@@ -164,18 +266,174 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void onShowCalendar(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onShowCalendar
-        SwingCalendar sc = new SwingCalendar(this);
-        
-    }//GEN-LAST:event_onShowCalendar
-
     private void btOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btOkActionPerformed
+        String sql = null;
+        SQLQuery query = null;
+        JDatePickerImpl dpiBegin = (JDatePickerImpl) jPanel3.getComponent(0);
+        JDatePickerImpl dpiEnd = (JDatePickerImpl) jPanel8.getComponent(0);
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        Date begin = (Date) dpiBegin.getModel().getValue();
+        Date end = (Date) dpiEnd.getModel().getValue();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(begin);
+
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        Object[][] oL = cdd.getTimeList();
+        String updateLectSql = "UPDATE lecture "
+                + "SET rid = " + room.getRid() + ", "
+                + "uid = " + staff.getUid() + ", "
+                + "preference = 0 "
+                + "WHERE lid = " + lecture.getLid();
+        query = session.createSQLQuery(updateLectSql);
+        query.executeUpdate();
+        if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
+            java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
+            java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
+            String updateCourseSql = "UPDATE course "
+                    + "SET startDat = '" + sqlBegin + "', "
+                    + "endDat = '" + sqlEnd + "' "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateCourseSql);
+            query.executeUpdate();
+            String delStatement = "DELETE FROM course_day_time "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(delStatement);
+            query.executeUpdate();
+            while (gc.getTime().before(end)) {
+                String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+                for (int k = 0; k < oL.length; k++) {
+                    if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
+                        try {
+                            String vonStr = oL[k][1] + "";
+                            String bisStr = oL[k][2] + "";
+                            Date von = format.parse(vonStr);
+                            java.sql.Date sqlVon = new java.sql.Date(von.getTime());
+                            Date bis = format.parse(bisStr);
+                            java.sql.Date sqlBis = new java.sql.Date(bis.getTime());
+                            java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
+                            java.sql.Time sqlVonTime = new Time(von.getTime());
+                            java.sql.Time sqlBisTime = new Time(bis.getTime());
+                            String statement = "INSERT INTO course_day_time "
+                                    + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
+                            query = session.createSQLQuery(statement);
+                            query.executeUpdate();
+                        } catch (ParseException ex) {
+                            Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                gc.add(Calendar.DATE, 1);
+            }
+        } else {
+            java.sql.Date sqlDate = new java.sql.Date(begin.getTime());
+            Date beginTime = (Date) timeSpinner.getModel().getValue();
+            Date endTime = (Date) timeSpinner2.getModel().getValue();
+
+            java.sql.Time sqlBeginTime = new Time(beginTime.getTime());
+            java.sql.Time sqlEndTime = new Time(endTime.getTime());
+            String updateEventSql = "UPDATE event "
+                    + "SET datum = '" + sqlDate + "', "
+                    + "von = '" + sqlBeginTime + "', "
+                    + "bis = '" + sqlEndTime + "' "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateEventSql);
+            query.executeUpdate();
+        }
+        session.getTransaction().commit();
+        session.close();
         this.dispose();
     }//GEN-LAST:event_btOkActionPerformed
 
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_btCancelActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        ChooseRoomDialog crd = new ChooseRoomDialog(null, true);
+        room = crd.setVisible();
+        tfRoom.setText(room.getName());
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        ChooseCourseEventDialog cced = new ChooseCourseEventDialog(null, true);
+        if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
+            cced.setIsCourse(true);
+            cced.setTitle("Choose Course");
+        } else {
+            cced.setIsCourse(false);
+            cced.setTitle("Choose Event");
+        }
+        lecture = cced.showCourseDialog(false);
+        tfLecture.setText(lecture.getName());
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ChooseTeacherDialog ctd = new ChooseTeacherDialog(null, true);
+        staff = ctd.showTeachers();
+        tfTeacher.setText(staff.getUsername());
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btShowPreferencesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btShowPreferencesActionPerformed
+        String sql = null;
+        SQLQuery sqlQuery = null;
+        Query query = null;
+        if (lecture != null)
+        {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            String getLectureQuery = "from lecture INNER JOIN l.course as course USING (lid) "
+                    + "WHERE lid = " + lecture.getLid() + " "
+                    + "AND preference = 1";
+            query = session.createQuery(getLectureQuery);
+            List returns = query.list();
+            String getLectureQuery2 = "from lecture INNER JOIN event USING (lid) "
+                    + "WHERE lid = " + lecture.getLid() + " "
+                    + "AND preference = 1";
+                query = session.createQuery(getLectureQuery2);
+                List returnsEv = query.list();
+            if (returns.size()> 0)
+            {
+                String getRoomQuery = "from room "
+                    + "WHERE rid = " + returns.get(3);
+                String getUserQuery = "from user "
+                    + "WHERE uid = " + returns.get(4);
+                String getCourseQuery = "from course "
+                        + "WHERE lid = " + lecture.getLid();
+                String getCourseDayTimeQuery = "from course_day_time "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createQuery(getRoomQuery);
+                List roomResult = query.list();
+                query = session.createQuery(getUserQuery);
+                List userResult = query.list();
+                query = session.createQuery(getCourseQuery);
+                List courseResult = query.list();
+                query = session.createQuery(getCourseDayTimeQuery);
+                List courseDayTimeResult = query.list();
+            }
+            if (returnsEv.size() > 0)
+            {
+                String getRoomQuery = "from room "
+                    + "WHERE rid = " + returns.get(3);
+                String getUserQuery = "from user "
+                    + "WHERE uid = " + returns.get(4);
+                String getEventQuery = "from event "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createQuery(getRoomQuery);
+                List roomResult = query.list();
+                query = session.createQuery(getUserQuery);
+                List userResult = query.list();
+                query = session.createQuery(getEventQuery);
+                List eventResult = query.list();
+                room = new Room((Integer)roomResult.get(0), (String)roomResult.get(1), (int) roomResult.get(2));
+                staff = new User((Integer) userResult.get(0), (String) userResult.get(1), (String) userResult.get(2), (String) userResult.get(3), (String) userResult.get(4));
+                Event event = new Event(lecture, 0, (Date)eventResult.get(2), (Date)eventResult.get(3), (Date)eventResult.get(4));
+            }
+            
+            
+        }
+    }//GEN-LAST:event_btShowPreferencesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,20 +479,76 @@ public class AssignCourseDialog extends javax.swing.JDialog {
             }
         });
     }
+    
+    
+        private void changeGUI() {
+        if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
+            jLabel4.setVisible(false);
+            jLabel5.setVisible(false);
+            timeSpinner.setVisible(false);
+            timeSpinner2.setVisible(false);
+            jLabel6.setVisible(true);
+            jPanel8.setVisible(true);
+            jLabel3.setText("Start Date");
+            cdd.setVisible(true);
+        } else {
+            jLabel3.setText("Date");
+            jLabel6.setVisible(false);
+            jPanel8.setVisible(false);
+            jLabel4.setVisible(true);
+            jLabel5.setVisible(true);
+            timeSpinner.setVisible(true);
+            timeSpinner2.setVisible(true);
+            cdd.setVisible(false);
+        }
+
+    }
+
+    private class MyActionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            AssignCourseDialog.this.changeGUI();
+        }
+
+    }
+    
+    private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
+
+    private String datePattern = "dd.MM.yyyy";
+    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+    @Override
+    public Object stringToValue(String text) throws ParseException {
+        return dateFormatter.parseObject(text);
+    }
+
+    @Override
+    public String valueToString(Object value) throws ParseException {
+        if (value != null) {
+            Calendar cal = (Calendar) value;
+            return dateFormatter.format(cal.getTime());
+        }
+
+        return "";
+    }
+
+}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgCourseEvent;
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btOk;
+    private javax.swing.JButton btShowPreferences;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -242,7 +556,14 @@ public class AssignCourseDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JRadioButton rbCourse;
+    private javax.swing.JRadioButton rbEvent;
+    private javax.swing.JTextField tfLecture;
+    private javax.swing.JTextField tfRoom;
+    private javax.swing.JTextField tfTeacher;
     private javax.swing.JSpinner timeSpinner;
     private javax.swing.JSpinner timeSpinner2;
     // End of variables declaration//GEN-END:variables

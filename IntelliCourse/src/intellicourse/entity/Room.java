@@ -1,10 +1,9 @@
 package intellicourse.entity;
-// Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1
+// Generated 08.12.2015 10:38:01 by Hibernate Tools 4.3.1
 
 
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,12 +31,18 @@ public class Room  implements java.io.Serializable {
     public Room() {
     }
 
-	
-    public Room(Integer rid, String name, int anzSitzplatz) {
+    public Room(Integer rid, String name, int anzSitzplatz)
+    {
         this.rid = rid;
         this.name = name;
         this.anzSitzplatz = anzSitzplatz;
+        
     }
+
+    public Room(Integer rid) {
+        this.rid = rid;
+    }
+    
     
     public Room(String name, int anzSitzplatz) {
         this.name = name;
@@ -52,7 +57,7 @@ public class Room  implements java.io.Serializable {
      @Id @GeneratedValue(strategy=IDENTITY)
 
     
-    @Column(name="rid", unique=true)
+    @Column(name="rid", unique=true, nullable=false)
     public Integer getRid() {
         return this.rid;
     }
@@ -62,7 +67,7 @@ public class Room  implements java.io.Serializable {
     }
 
     
-    @Column(name="name", length=50)
+    @Column(name="name", nullable=false, length=50)
     public String getName() {
         return this.name;
     }
@@ -72,7 +77,7 @@ public class Room  implements java.io.Serializable {
     }
 
     
-    @Column(name="anzSitzplatz")
+    @Column(name="anzSitzplatz", nullable=false)
     public int getAnzSitzplatz() {
         return this.anzSitzplatz;
     }

@@ -6,15 +6,17 @@
     <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/oad_db?zeroDateTimeBehavior=convertToNull</property>
     <property name="hibernate.connection.username">root</property>
-    <property name="hibernate.show_sql">true</property>
     <property name="hibernate.query.factory_class">org.hibernate.hql.internal.classic.ClassicQueryTranslatorFactory</property>
+    <property name="hibernate.show_sql">true</property>
     <mapping resource="intellicourse/entity/Student.hbm.xml"/>
     <mapping resource="intellicourse/entity/Room.hbm.xml"/>
     <mapping resource="intellicourse/entity/Event.hbm.xml"/>
     <mapping resource="intellicourse/entity/Course.hbm.xml"/>
     <mapping resource="intellicourse/entity/Staff.hbm.xml"/>
+    <mapping resource="intellicourse/entity/Curriculum.hbm.xml"/>
     <mapping resource="intellicourse/entity/Admin.hbm.xml"/>
     <mapping resource="intellicourse/entity/User.hbm.xml"/>
+    <mapping resource="intellicourse/entity/CourseDayTime.hbm.xml"/>
     <mapping resource="intellicourse/entity/Lecture.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

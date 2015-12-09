@@ -1,5 +1,5 @@
 package intellicourse.entity;
-// Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1
+// Generated 08.12.2015 10:38:01 by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -28,21 +28,24 @@ public class Course  implements java.io.Serializable {
 
      private int lid;
      private Lecture lecture;
-     private int kursnr;
+     private Integer kursnr;
      private Date startDat;
      private Date endDat;
+     private CourseDayTime courseDayTime;
 
     public Course() {
     }
 
+	
     public Course(Lecture lecture) {
-       this.lecture = lecture;
+        this.lecture = lecture;
     }
-    public Course(Lecture lecture, int kursnr, Date startDat, Date endDat) {
+    public Course(Lecture lecture, Integer kursnr, Date startDat, Date endDat, CourseDayTime courseDayTime) {
        this.lecture = lecture;
        this.kursnr = kursnr;
        this.startDat = startDat;
        this.endDat = endDat;
+       this.courseDayTime = courseDayTime;
     }
    
      @GenericGenerator(name="generator", strategy="foreign", parameters=@Parameter(name="property", value="lecture"))@Id @GeneratedValue(generator="generator")
@@ -57,7 +60,7 @@ public class Course  implements java.io.Serializable {
         this.lid = lid;
     }
 
-@OneToOne(fetch=FetchType.LAZY, orphanRemoval = true)@PrimaryKeyJoinColumn
+@OneToOne(fetch=FetchType.LAZY)@PrimaryKeyJoinColumn
     public Lecture getLecture() {
         return this.lecture;
     }
@@ -67,12 +70,12 @@ public class Course  implements java.io.Serializable {
     }
 
     
-    @Column(name="kursnr", nullable=true)
-    public int getKursnr() {
+    @Column(name="kursnr")
+    public Integer getKursnr() {
         return this.kursnr;
     }
     
-    public void setKursnr(int kursnr) {
+    public void setKursnr(Integer kursnr) {
         this.kursnr = kursnr;
     }
 
@@ -94,6 +97,15 @@ public class Course  implements java.io.Serializable {
     
     public void setEndDat(Date endDat) {
         this.endDat = endDat;
+    }
+
+@OneToOne(fetch=FetchType.LAZY, mappedBy="course")
+    public CourseDayTime getCourseDayTime() {
+        return this.courseDayTime;
+    }
+    
+    public void setCourseDayTime(CourseDayTime courseDayTime) {
+        this.courseDayTime = courseDayTime;
     }
 
 

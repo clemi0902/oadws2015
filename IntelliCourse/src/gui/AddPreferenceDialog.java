@@ -5,15 +5,33 @@
  */
 package gui;
 
-import java.awt.Image;
+import intellicourse.entity.Lecture;
+import intellicourse.entity.Room;
+import intellicourse.util.HibernateUtil;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 
 /**
  *
@@ -21,14 +39,47 @@ import javax.swing.SpinnerDateModel;
  */
 public class AddPreferenceDialog extends javax.swing.JDialog {
 
+    private CourseDayDialog cdd;
+    private Object[][] data ={ 
+    {"Monday", "08:00", "08:00", false},
+    {"Tuesday", "08:00", "08:00", false},
+    {"Wednesday", "08:00", "08:00", false},
+    {"Thursday", "08:00", "08:00", false},
+    {"Friday", "08:00", "08:00", false},
+    {"Saturday", "08:00", "08:00", false},
+    {"Sunday", "08:00", "08:00", false}};
+    private Lecture lecture = null;
+    private Room room = null;
+    private Properties p = new Properties();
+
+    int uid = -1;
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
     /**
      * Creates new form AddPreferenceDialog
      */
     public AddPreferenceDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
+        cdd = new CourseDayDialog(null, false);
+        cdd.setData(data);
+        cdd.setModalityType(ModalityType.MODELESS);
+        
+        this.setModalityType(ModalityType.MODELESS);
+
         initComponents();
+        jRadioButton1.addChangeListener(new MyChangeListener());
+        jRadioButton2.addChangeListener(new MyChangeListener());
+        this.setLocationRelativeTo(null);
+
+        changeGUI();
         this.setTitle("Add Preference");
-        cbCourseEvent.addActionListener(new MyActionListener());
+//        cbCourseEvent.addActionListener(new MyActionListener());
     }
 
     /**
@@ -40,19 +91,24 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        cbCourseEvent = new javax.swing.JComboBox(beans.LectureData.values());
+        jPanel7 = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        tfCourseEventName = new javax.swing.JTextField();
+        jButton6 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
+        tfRoom = new javax.swing.JTextField();
         jButton4 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox();
         jPanel5 = new javax.swing.JPanel();
-        jTextField3 = new javax.swing.JTextField();
-        jButton5 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jSpinner1 = new javax.swing.JSpinner(new SpinnerDateModel());
         jLabel5 = new javax.swing.JLabel();
@@ -64,64 +120,86 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(500, 300));
 
-        jPanel1.setLayout(new java.awt.GridLayout(5, 2));
+        jPanel1.setLayout(new java.awt.GridLayout(7, 2));
 
-        jLabel1.setText("Course/Event");
+        jLabel1.setText("Course/Event:");
         jPanel1.add(jLabel1);
 
-        /*
-        cbCourseEvent.setModel(null);
-        */
-        jPanel1.add(cbCourseEvent);
+        jPanel7.setLayout(new java.awt.GridLayout(2, 0));
+
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Course");
+        jRadioButton1.setActionCommand("Course");
+        jPanel7.add(jRadioButton1);
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setText("Event");
+        jRadioButton2.setActionCommand("Event");
+        jPanel7.add(jRadioButton2);
+
+        jPanel1.add(jPanel7);
+
+        jLabel3.setText("Course/Event Name:");
+        jPanel1.add(jLabel3);
+
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        tfCourseEventName.setEnabled(false);
+        tfCourseEventName.setFocusable(false);
+        jPanel6.add(tfCourseEventName, java.awt.BorderLayout.CENTER);
+
+        jButton6.setText("...");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel6.add(jButton6, java.awt.BorderLayout.LINE_END);
+
+        jPanel1.add(jPanel6);
 
         jLabel2.setText("Room:");
         jPanel1.add(jLabel2);
 
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        jTextField2.setEnabled(false);
-        jPanel4.add(jTextField2, java.awt.BorderLayout.CENTER);
+        tfRoom.setEnabled(false);
+        jPanel4.add(tfRoom, java.awt.BorderLayout.CENTER);
 
         jButton4.setText("...");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jButton4, java.awt.BorderLayout.EAST);
 
         jPanel1.add(jPanel4);
 
+        jLabel6.setText("Room Priority:");
+        jPanel1.add(jLabel6);
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "2", "3", "4", "5" }));
+        jPanel1.add(jComboBox1);
+
         jPanel5.setLayout(new java.awt.BorderLayout());
         jPanel5.setBorder(BorderFactory.createTitledBorder("Start Date"));
 
-        jTextField3.setEnabled(false);
-        jTextField3.setFocusable(false);
-        jPanel5.add(jTextField3, java.awt.BorderLayout.CENTER);
-
-        try{
-            Image img = ImageIO.read(getClass().getResource("../resources/calendar-icon.png"));
-            Image resizedImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-            jButton5.setIcon(new ImageIcon(resizedImage));
-        }catch(IOException ex)
-        {
-        }
-        jPanel5.add(jButton5, java.awt.BorderLayout.EAST);
+        UtilDateModel model = new UtilDateModel();
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        jPanel5.add(datePicker);
 
         jPanel1.add(jPanel5);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        jTextField1.setEditable(false);
-        jTextField1.setEnabled(false);
-        jTextField1.setFocusable(false);
-        jPanel3.add(jTextField1, java.awt.BorderLayout.CENTER);
-
-        try{
-            Image img = ImageIO.read(getClass().getResource("../resources/calendar-icon.png"));
-            Image resizedImage = img.getScaledInstance(30, 30, java.awt.Image.SCALE_SMOOTH);
-            jButton3.setIcon(new ImageIcon(resizedImage));
-        }catch(IOException ex)
-        {
-        }
-        jPanel3.add(jButton3, java.awt.BorderLayout.LINE_END);
-
         jPanel3.setBorder(BorderFactory.createTitledBorder("End Date"));
+        UtilDateModel model2 = new UtilDateModel();
+        JDatePanelImpl datePanel2 = new JDatePanelImpl(model2, p);
+        JDatePickerImpl datePicker2 = new JDatePickerImpl(datePanel2, new DateLabelFormatter());
+        jPanel3.add(datePicker2);
 
         jPanel1.add(jPanel3);
 
@@ -130,6 +208,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
 
         JSpinner.DateEditor timeEditor = new JSpinner.DateEditor(jSpinner1, "HH:mm");
         jSpinner1.setEditor(timeEditor);
+        jSpinner1.setValue(new Date(0, 0, 0, 8, 0, 0));
         jPanel1.add(jSpinner1);
 
         jLabel5.setText("End Time:");
@@ -137,6 +216,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
 
         JSpinner.DateEditor timeEditor2 = new JSpinner.DateEditor(jSpinner2, "HH:mm");
         jSpinner2.setEditor(timeEditor2);
+        jSpinner2.setValue(new Date(0, 0, 0, 8, 0, 0));
         jPanel1.add(jSpinner2);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -166,6 +246,80 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        String sql = null;
+        SQLQuery query = null;
+        JDatePickerImpl dpiBegin = (JDatePickerImpl) jPanel5.getComponent(0);
+        JDatePickerImpl dpiEnd = (JDatePickerImpl) jPanel3.getComponent(0);
+        DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        Date begin = (Date) dpiBegin.getModel().getValue();
+        Date end = (Date) dpiEnd.getModel().getValue();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(begin);
+
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        Object[][] oL = cdd.getTimeList();
+        String updateLectSql = "UPDATE lecture "
+                + "SET rid = " + room.getRid() + ", "
+                + "uid = " + uid + ", "
+                + "preference = 1, "
+                + "priority = " + jComboBox1.getSelectedItem().toString() + " "
+                + "WHERE lid = " + lecture.getLid();
+        query = session.createSQLQuery(updateLectSql);
+        query.executeUpdate();
+        if (buttonGroup1.getSelection().getActionCommand().equals("Course")) {
+            java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
+            java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
+            String updateCourseSql = "UPDATE course "
+                    + "SET startDat = '" + sqlBegin + "', "
+                    + "endDat = '" + sqlEnd + "' "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateCourseSql);
+            query.executeUpdate();
+            while (gc.getTime().before(end)) {
+                String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+                for (int k = 0; k < oL.length; k++) {
+                    if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
+                        try {
+                            String vonStr = oL[k][1] + "";
+                            String bisStr = oL[k][2] + "";
+                            Date von = format.parse(vonStr);
+                            java.sql.Date sqlVon = new java.sql.Date(von.getTime());
+                            Date bis = format.parse(bisStr);
+                            java.sql.Date sqlBis = new java.sql.Date(bis.getTime());
+                            java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
+                            java.sql.Time sqlVonTime = new Time(von.getTime());
+                            java.sql.Time sqlBisTime = new Time(bis.getTime());
+                            String statement = "INSERT INTO course_day_time "
+                                    + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
+                            query = session.createSQLQuery(statement);
+                            query.executeUpdate();
+                        } catch (ParseException ex) {
+                            Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+                gc.add(Calendar.DATE, 1);
+            }
+        } else {
+            java.sql.Date sqlDate = new java.sql.Date(begin.getTime());
+            Date beginTime = (Date) jSpinner1.getModel().getValue();
+            Date endTime = (Date) jSpinner2.getModel().getValue();
+
+            java.sql.Time sqlBeginTime = new Time(beginTime.getTime());
+            java.sql.Time sqlEndTime = new Time(endTime.getTime());
+            String updateEventSql = "UPDATE event "
+                    + "SET datum = '" + sqlDate + "', "
+                    + "von = '" + sqlBeginTime + "', "
+                    + "bis = '" + sqlEndTime + "' "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateEventSql);
+            query.executeUpdate();
+        }
+        session.getTransaction().commit();
+        session.close();
+
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -173,30 +327,94 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private class MyActionListener implements ActionListener{
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        ChooseCourseEventDialog cced = new ChooseCourseEventDialog(null, true);
+        if (buttonGroup1.getSelection().getActionCommand().equals("Course")) {
+            cced.setIsCourse(true);
+            cced.setTitle("Choose Course");
+        } else {
+            cced.setIsCourse(false);
+            cced.setTitle("Choose Event");
+        }
+        lecture = cced.showCourseDialog(true);
+        if (lecture != null) {
+            tfCourseEventName.setText(lecture.getName());
+        } else {
+            tfCourseEventName.setText("");
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        ChooseRoomDialog crd = new ChooseRoomDialog(null, true);
+        room = crd.setVisible();
+        if (room != null) {
+            tfRoom.setText(room.getName());
+        } else {
+            tfRoom.setText("");
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void changeGUI() {
+        if (buttonGroup1.getSelection().getActionCommand().equals("Course")) {
+            jLabel4.setVisible(false);
+            jLabel5.setVisible(false);
+            jSpinner1.setVisible(false);
+            jSpinner2.setVisible(false);
+            jPanel3.setVisible(true);
+            jPanel5.setBorder(BorderFactory.createTitledBorder("Start Date"));
+            cdd.setVisible(true);
+        } else {
+            jPanel3.setVisible(false);
+            jPanel5.setBorder(BorderFactory.createTitledBorder("Date"));
+            jLabel4.setVisible(true);
+            jLabel5.setVisible(true);
+            jSpinner1.setVisible(true);
+            jSpinner2.setVisible(true);
+            cdd.setVisible(false);
+        }
+
+    }
+
+    private class MyActionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            changeGUI();
+            AddPreferenceDialog.this.changeGUI();
         }
-        private void changeGUI()
-        {
-            if (cbCourseEvent.getSelectedItem().toString().equals("Course"))
-            {
-                jPanel3.setVisible(true);
-                jPanel5.setBorder(BorderFactory.createTitledBorder("Start Date"));
-            }
 
-            else
-            {
-                jPanel3.setVisible(false);
-                jPanel5.setBorder(BorderFactory.createTitledBorder("Date"));
-            }
-
-        }
-        
     }
-    
+
+    private class DateLabelFormatter extends AbstractFormatter {
+
+        private String datePattern = "dd.MM.yyyy";
+        private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            return dateFormatter.parseObject(text);
+        }
+
+        @Override
+        public String valueToString(Object value) throws ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
+
+            return "";
+        }
+
+    }
+
+    private class MyChangeListener implements ChangeListener {
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            AddPreferenceDialog.this.changeGUI();
+
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -240,25 +458,30 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cbCourseEvent;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
+    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JSpinner jSpinner1;
     private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField tfCourseEventName;
+    private javax.swing.JTextField tfRoom;
     // End of variables declaration//GEN-END:variables
 }

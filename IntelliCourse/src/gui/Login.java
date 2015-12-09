@@ -186,7 +186,7 @@ public class Login extends javax.swing.JFrame {
     private boolean checkStudentLogin() {
         List resultList = null;
         try {
-            String query = "from Student s "
+            String query = "SELECT s.uid from Student s "
                     + "WHERE s.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
                     + "AND password LIKE '" + tfPassword.getText() + "')";
@@ -201,6 +201,7 @@ public class Login extends javax.swing.JFrame {
         if (resultList.isEmpty()) {
             return false;
         } else {
+            uid = (int) resultList.get(0);
             return true;
         }
     }
@@ -208,7 +209,7 @@ public class Login extends javax.swing.JFrame {
     private boolean checkStaffLogin() {
         List resultList = null;
         try {
-            String query = "from Staff s "
+            String query = "SELECT s.uid from Staff s "
                     + "WHERE s.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
                     + "AND password LIKE '" + tfPassword.getText() + "')";
@@ -223,6 +224,7 @@ public class Login extends javax.swing.JFrame {
         if (resultList.isEmpty()) {
             return false;
         } else {
+            uid = (int) resultList.get(0);
             return true;
         }
     }

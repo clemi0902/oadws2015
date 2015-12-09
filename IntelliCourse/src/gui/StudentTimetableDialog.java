@@ -5,17 +5,102 @@
  */
 package gui;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
+import javax.swing.JFormattedTextField;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
+
 /**
  *
  * @author Clemens
  */
 public class StudentTimetableDialog extends javax.swing.JDialog {
 
+    private int uid;
+    private Properties p = new Properties();
+    private Object [][] data = { 
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""},
+    {"", "", "", "", "", "", ""}};
+
+    public void setUid(int uid) {
+        this.uid = uid;
+        this.setVisible(true);
+    }
     /**
      * Creates new form StudentTimetableDialog
      */
+    
+    
+    
     public StudentTimetableDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        p.put("text.today", "Today");
+        p.put("text.month", "Month");
+        p.put("text.year", "Year");
         initComponents();
         this.setTitle("Student Timetable");
     }
@@ -29,24 +114,14 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton3 = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jPanel1.setLayout(new java.awt.GridLayout(1, 0));
-
-        jButton1.setText("<=");
-        jPanel1.add(jButton1);
-
-        jButton2.setText("=>");
-        jPanel1.add(jButton2);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_START);
 
         jTable1.setModel(new TeacherTimeTableModel());
         jScrollPane1.setViewportView(jTable1);
@@ -61,6 +136,27 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         });
         getContentPane().add(jButton3, java.awt.BorderLayout.PAGE_END);
 
+        jPanel2.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
+
+        UtilDateModel model = new UtilDateModel();
+        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
+        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        jPanel1.add(datePicker);
+
+        jPanel2.add(jPanel1);
+
+        jButton1.setText("Show Week");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton1);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.NORTH);
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -69,6 +165,41 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        ArrayList<Date> weekDates = getWeekDates();
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void createList(ArrayList<Date> wd)
+    {
+        Date cd;
+        java.sql.Date sqlDate = null;
+        String courseSql = "SELECT cdt.von AS vonzeit, cdt.bis AS biszeit FROM lecture l "
+                + "INNER JOIN course c USING (lid) "
+                + "INNER JOIN course_day_time cdt "
+                + "INNER JOIN student_lecture sl "
+                + "WHERE sl.uid = " + uid + " "
+                + "AND cdt.day = '" + sqlDate + "'";
+    }
+    
+    private ArrayList<Date> getWeekDates()
+    {
+        ArrayList <Date> weekDates = new ArrayList<>();
+        JDatePickerImpl dpiDate = (JDatePickerImpl) jPanel1.getComponent(0);
+        Date chosenDate = (Date) dpiDate.getModel().getValue();
+        Calendar c = Calendar.getInstance();
+        c.setTime(chosenDate);
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        int diff = 0 - dayOfWeek + 1;
+        for (int i = 0; i < 7; i++)
+        {
+            c.setTime(chosenDate);
+            c.add(Calendar.DATE, diff + i);
+            weekDates.add(c.getTime());
+        }
+        return weekDates;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -111,11 +242,33 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         });
     }
 
+        private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
+
+        private String datePattern = "dd.MM.yyyy";
+        private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            return dateFormatter.parseObject(text);
+        }
+
+        @Override
+        public String valueToString(Object value) throws ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
+
+            return "";
+        }
+
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

@@ -39,7 +39,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         tfFilterFirstName.getDocument().addDocumentListener(new MyDocumentListener());
         tfFilterLastName.getDocument().addDocumentListener(new MyDocumentListener());
         tbAnzeige.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        this.setTitle("Teaching Stuff");
+        this.setTitle("Teaching Staff");
         displayData();
     }
     
@@ -150,6 +150,11 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         jPanel1.add(jButton1);
 
         jButton2.setText("Delete");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onDeleteStaff(evt);
+            }
+        });
         jPanel1.add(jButton2);
 
         jButton3.setText("Edit");
@@ -217,6 +222,45 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void onDeleteStaff(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onDeleteStaff
+        int selectedIndex = tbAnzeige.getSelectedRow();
+        if (selectedIndex >= 0)
+        {
+            String sql = null;
+        SQLQuery query = null;
+        try {
+            int uid = Integer.parseInt(tbAnzeige.getModel().getValueAt(selectedIndex, 0).toString());
+            User user = new User(uid, tbAnzeige.getModel().getValueAt(selectedIndex, 1).toString(), tbAnzeige.getModel().getValueAt(selectedIndex, 2).toString(), tbAnzeige.getModel().getValueAt(selectedIndex, 3).toString(),
+            tbAnzeige.getModel().getValueAt(selectedIndex, 4).toString());
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            sql = "SELECT lid FROM lecture WHERE uid = " + uid;
+            query = session.createSQLQuery(sql);
+            List results = query.list();
+            for (Object o : results)
+            {
+                int lid = (int) o;
+                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
+                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
+                query = session.createSQLQuery(sqlCourse);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlEvent);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlStudLect);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlLect);
+                query.executeUpdate(); 
+            }
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        displayData();
+        }
+    }//GEN-LAST:event_onDeleteStaff
 
     /**
      * @param args the command line arguments

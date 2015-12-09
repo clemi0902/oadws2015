@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1 -->
+<!-- Generated 08.12.2015 10:38:02 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
     <class name="intellicourse.entity.User" table="user" catalog="oad_db" optimistic-lock="version">
         <id name="uid" type="java.lang.Integer">
@@ -9,16 +9,16 @@
             <generator class="identity" />
         </id>
         <property name="username" type="string">
-            <column name="username" length="30" not-null="false" />
+            <column name="username" length="30" not-null="true" />
         </property>
         <property name="password" type="string">
-            <column name="password" length="30" not-null="false" />
+            <column name="password" length="30" not-null="true" />
         </property>
         <property name="vorname" type="string">
-            <column name="vorname" length="50" not-null="false" />
+            <column name="vorname" length="50" not-null="true" />
         </property>
         <property name="nachname" type="string">
-            <column name="nachname" length="50" not-null="false" />
+            <column name="nachname" length="50" not-null="true" />
         </property>
         <one-to-one name="staff" class="intellicourse.entity.Staff"></one-to-one>
         <one-to-one name="admin" class="intellicourse.entity.Admin"></one-to-one>

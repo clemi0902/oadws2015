@@ -140,8 +140,8 @@ public class RoomDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         AddRoomDialog ard = new AddRoomDialog(null, rootPaneCheckingEnabled);
-        ard.addWindowListener(new MyWindowAdapter());
         ard.setVisible(true);
+        showFilteredData();
         
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -150,13 +150,13 @@ public class RoomDialog extends javax.swing.JDialog {
         if (selectedIndex >= 0)
         {
             AddRoomDialog erd = new AddRoomDialog(null, rootPaneCheckingEnabled);
-            erd.addWindowListener(new MyWindowAdapter());
         erd.setTitle("Edit Room");
             erd.setEditMode();
             Room room = new Room(Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 0).toString()), 
                     tbRooms.getModel().getValueAt(selectedIndex, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 2).toString()));
             erd.showRoom(room);
             erd.setVisible(true);
+            showFilteredData();
         }
         
         
@@ -201,6 +201,7 @@ public class RoomDialog extends javax.swing.JDialog {
             query = session.createSQLQuery(sqlRoom);
             query.executeUpdate();
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -233,6 +234,7 @@ public class RoomDialog extends javax.swing.JDialog {
             List resultList = q.list();
             displayResult(resultList);
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -267,26 +269,7 @@ public class RoomDialog extends javax.swing.JDialog {
 
     }
 
- 
-    private class MyWindowAdapter extends WindowAdapter{
 
-        @Override
-        public void windowClosing(WindowEvent e) {
-            RoomDialog.this.showFilteredData();
-        }
-
-        @Override
-        public void windowDeactivated(WindowEvent e) {
-            RoomDialog.this.showFilteredData();
-        }
-
-        @Override
-        public void windowClosed(WindowEvent e) {
-            RoomDialog.this.showFilteredData();
-        }
-        
-        
-    }
 
     private class MyDocumentListener implements DocumentListener {
 

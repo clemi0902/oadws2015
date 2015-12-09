@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 30.11.2015 15:40:21 by Hibernate Tools 4.3.1 -->
+<!-- Generated 08.12.2015 10:38:02 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
     <class name="intellicourse.entity.Room" table="room" catalog="oad_db" optimistic-lock="version">
         <id name="rid" type="java.lang.Integer">
@@ -9,14 +9,14 @@
             <generator class="identity" />
         </id>
         <property name="name" type="string">
-            <column name="name" length="50" not-null="false" />
+            <column name="name" length="50" not-null="true" />
         </property>
         <property name="anzSitzplatz" type="int">
-            <column name="anzSitzplatz" not-null="false" />
+            <column name="anzSitzplatz" not-null="true" />
         </property>
-        <set name="lectures" cascade="all" table="lecture" inverse="true" lazy="true" fetch="select">
+        <set name="lectures" table="lecture" inverse="true" lazy="true" fetch="select">
             <key>
-                <column name="rid" not-null="false" />
+                <column name="rid" />
             </key>
             <one-to-many class="intellicourse.entity.Lecture" />
         </set>
