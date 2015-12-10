@@ -69,7 +69,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jPanel1.add(jComboBox2);
 
-        jLabel3.setText("Date/Day of Week");
+        jLabel3.setText("Date/Day of Week:");
         jPanel1.add(jLabel3);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
