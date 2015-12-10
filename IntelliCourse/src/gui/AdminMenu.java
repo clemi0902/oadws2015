@@ -90,6 +90,11 @@ public class AdminMenu extends javax.swing.JFrame {
         jPanel1.add(jButton5);
 
         jButton6.setText("Curricula");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jButton6);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -131,6 +136,12 @@ public class AdminMenu extends javax.swing.JFrame {
         AssignCourseDialog aced = new AssignCourseDialog(this, rootPaneCheckingEnabled);
         aced.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        CurriculaDialog cd = new CurriculaDialog(this, rootPaneCheckingEnabled);
+        cd.setVisible(true);
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments

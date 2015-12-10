@@ -37,6 +37,7 @@ public class AddCurriculumDialog extends javax.swing.JDialog {
     //some variables;
         int courseid[] = new int[100];
         int cCount = 0;
+        int editID = 0;
         
     /**
      * Creates new form AddCurriculumDialog
@@ -217,6 +218,15 @@ public class AddCurriculumDialog extends javax.swing.JDialog {
         showSelectedCourse();
     }                                                
 
+    public void editCurricula(int[] IDs, int numberId, int curriculaID) {
+        for(int i = 0; i < numberId; i++) {
+            courseid[i] = IDs[i];
+        }
+        cCount = numberId;
+        editID = curriculaID;
+        showSelectedCourse();
+    }
+    
     private void displayData() {
         String sql;
         sql = "select l.lid, l.name, l.beschreibung from Lecture as l "
@@ -280,7 +290,25 @@ public class AddCurriculumDialog extends javax.swing.JDialog {
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             
-            Curriculum curriculum = new Curriculum();
+            Curriculum curriculum = null;
+            
+            if(editID != 0)
+            {
+                String tmp = "SELECT * FROM curriculum AS c WHERE c.cid = " + Integer.toString(editID);
+                SQLQuery quer = session.createSQLQuery(tmp);
+                quer.setResultTransformer(Transformers.aliasToBean(Curriculum.class));
+                List<Curriculum> resultList = quer.list();
+                
+                for(Object o : resultList)
+                {
+                    curriculum = (Curriculum) o;
+                }
+            }
+            if (curriculum == null)
+            {
+               curriculum = new Curriculum();
+            }
+            
             curriculum.setName(name);
             
             Set<Lecture> courses = new HashSet(0);
@@ -304,7 +332,10 @@ public class AddCurriculumDialog extends javax.swing.JDialog {
             
             curriculum.setLectures(courses);
             
-            session.save(curriculum);
+            if(editID != 0)
+            { session.update(curriculum); }
+            else
+            { session.save(curriculum); }
             session.getTransaction().commit();
             
         } catch (Exception e) {

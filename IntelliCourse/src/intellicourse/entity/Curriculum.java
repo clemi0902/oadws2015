@@ -74,6 +74,10 @@ public class Curriculum  implements java.io.Serializable {
     public void setLectures(Set lectures) {
         this.lectures = lectures;
     }
+    /*public void getCid(int CID) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }*/
+
 
 
 

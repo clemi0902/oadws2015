@@ -5,7 +5,22 @@
  */
 package gui;
 
+import intellicourse.entity.Curriculum;
+import intellicourse.entity.Lecture;
+import intellicourse.util.HibernateUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 import javax.swing.BorderFactory;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 
 /**
  *
@@ -20,6 +35,8 @@ public class CurriculaDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.setTitle("Curricula");
         initComponents();
+        jfFilterField.getDocument().addDocumentListener(new MyDocumentListener());
+        displayData();
     }
 
     /**
@@ -32,53 +49,177 @@ public class CurriculaDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
+        table = new javax.swing.JTable();
+        jfFilterField = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        jbAddCurricula = new javax.swing.JButton();
+        jbRemoveCurricula = new javax.swing.JButton();
+        jbEditCurricula = new javax.swing.JButton();
+        jbOkButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {0, "SEW"},
-                {1, "Informatik"},
-                {2, "Telematik"},
-                {3, "Psychologie"}
+                {}
             },
             new String [] {
                 "Curriculum ID", "Curriculum Name"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(table);
 
         getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jTextField1.setBorder(BorderFactory.createTitledBorder("Filter Curricula"));
-        getContentPane().add(jTextField1, java.awt.BorderLayout.PAGE_START);
+        jfFilterField.setBorder(BorderFactory.createTitledBorder("Filter Curricula"));
+        getContentPane().add(jfFilterField, java.awt.BorderLayout.PAGE_START);
 
-        jPanel1.setLayout(new java.awt.GridLayout());
+        jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton1.setText("Add");
-        jPanel1.add(jButton1);
+        jbAddCurricula.setText("Add");
+        jbAddCurricula.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbAddCurriculaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jbAddCurricula);
 
-        jButton2.setText("Remove");
-        jPanel1.add(jButton2);
+        jbRemoveCurricula.setText("Remove");
+        jbRemoveCurricula.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbRemoveCurriculaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jbRemoveCurricula);
 
-        jButton3.setText("Edit");
-        jPanel1.add(jButton3);
+        jbEditCurricula.setText("Edit");
+        jbEditCurricula.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbEditCurriculaActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jbEditCurricula);
 
-        jButton4.setText("Ok");
-        jPanel1.add(jButton4);
+        jbOkButton.setText("Ok");
+        jbOkButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbOkButtonActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jbOkButton);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jbAddCurriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAddCurriculaActionPerformed
+        // TODO add your handling code here:
+        AddCurriculumDialog acd = new AddCurriculumDialog(null, rootPaneCheckingEnabled);
+        acd.setVisible(true);
+    }//GEN-LAST:event_jbAddCurriculaActionPerformed
+
+    private void jbOkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbOkButtonActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+    }//GEN-LAST:event_jbOkButtonActionPerformed
+
+    private void jbRemoveCurriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRemoveCurriculaActionPerformed
+        // TODO add your handling code here:
+        
+        
+    }//GEN-LAST:event_jbRemoveCurriculaActionPerformed
+
+    private void jbEditCurriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbEditCurriculaActionPerformed
+        // TODO add your handling code here:
+        AddCurriculumDialog acd = new AddCurriculumDialog(null, rootPaneCheckingEnabled);
+        acd.setTitle("Edit Curriculum");
+        int rowindex = table.getSelectedRow();
+        int cid = Integer.parseInt(table.getValueAt(rowindex, 0).toString());
+        String name = table.getValueAt(rowindex, 1).toString();
+        Set<Lecture> lecture = new HashSet(0);
+        
+        //SQL Statements to get lecture set
+        String sql;
+        sql = "SELECT l.lid from lecture l "
+                + "INNER JOIN curriculum_lecture cl USING (lid) " 
+                + "WHERE cl.cid = " + Integer.toString(cid);
+        
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            SQLQuery q = session.createSQLQuery(sql);
+            q.addScalar("lid",new IntegerType());
+            q.setResultTransformer(Transformers.aliasToBean(Lecture.class));
+            List resultList = q.list();
+            session.getTransaction().commit(); 
+            
+            int[] list = new int[100];
+            int i = 0;
+                    
+            for (Object o : resultList) {
+                Lecture lec = (Lecture) o;
+                list[i] = lec.getLid();
+                i++;
+            }
+            
+            acd.editCurricula(list, i, cid);         
+                   
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        acd.setVisible(true);
+        
+        
+    }//GEN-LAST:event_jbEditCurriculaActionPerformed
+
+    private void displayData() {
+        String sql;
+        sql = "select c.cid, c.name from curriculum as c "
+                + "WHERE UPPER(c.name) LIKE '" + jfFilterField.getText().trim().toUpperCase() + "%'";
+        executeQuery(sql);
+    }
+        
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            SQLQuery q = session.createSQLQuery(query);
+            q.addScalar("cid",new IntegerType());
+            q.addScalar("name",new StringType());
+            q.setResultTransformer(Transformers.aliasToBean(Curriculum.class));
+            List<Curriculum> resultList = q.list();
+            displayResult(resultList);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    
+    private void displayResult(List resultList) {
+        Vector<String> tableHead = new Vector<String>();
+        Vector tableData = new Vector();
+        tableHead.add("Cid");
+        tableHead.add("Name");
+        
+        for (Object o : resultList) {
+            Curriculum c = (Curriculum) o;
+            Vector<Object> row = new Vector<>();
+            row.add(c.getCid());
+            row.add(c.getName());          
+            tableData.add(row);
+        }
+        table.setModel(new DefaultTableModel(tableData, tableHead));
+    }
+    
+    
+    
+    
+    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -122,13 +263,32 @@ public class CurriculaDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JButton jbAddCurricula;
+    private javax.swing.JButton jbEditCurricula;
+    private javax.swing.JButton jbOkButton;
+    private javax.swing.JButton jbRemoveCurricula;
+    private javax.swing.JTextField jfFilterField;
+    private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
+
+    private class MyDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            CurriculaDialog.this.displayData();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            CurriculaDialog.this.displayData();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            CurriculaDialog.this.displayData();
+        }
+    }
+
 }
