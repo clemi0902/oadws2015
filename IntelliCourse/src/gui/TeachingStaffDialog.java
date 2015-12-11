@@ -113,10 +113,10 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         tbAnzeige = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        AddButton = new javax.swing.JButton();
+        DeleteButton = new javax.swing.JButton();
+        EditButton = new javax.swing.JButton();
+        OkButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         tfFilterUsername = new javax.swing.JTextField();
         tfFilterFirstName = new javax.swing.JTextField();
@@ -141,37 +141,37 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
-        jButton1.setText("Add");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        AddButton.setText("Add");
+        AddButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                AddButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1);
+        jPanel1.add(AddButton);
 
-        jButton2.setText("Delete");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        DeleteButton.setText("Delete");
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 onDeleteStaff(evt);
             }
         });
-        jPanel1.add(jButton2);
+        jPanel1.add(DeleteButton);
 
-        jButton3.setText("Edit");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        EditButton.setText("Edit");
+        EditButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                EditButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton3);
+        jPanel1.add(EditButton);
 
-        jButton4.setText("Ok");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        OkButton.setText("Ok");
+        OkButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                OkButtonActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton4);
+        jPanel1.add(OkButton);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -191,16 +191,16 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void AddButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddButtonActionPerformed
         // TODO add your handling code here:
         AddTeachingStaffDialog atsd = new AddTeachingStaffDialog(null, rootPaneCheckingEnabled);
         atsd.addWindowListener(new MyWindowAdapter());
         atsd.setIsAdd(true);
         atsd.setVisible(true);
      
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_AddButtonActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void EditButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditButtonActionPerformed
         // TODO add your handling code here:
         AddTeachingStaffDialog etsd = new AddTeachingStaffDialog(null, rootPaneCheckingEnabled);
         etsd.setTitle("Edit Teachinng Staff");
@@ -216,19 +216,19 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         etsd.fillFields();
         etsd.setVisible(true);
         displayData();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_EditButtonActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void OkButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OkButtonActionPerformed
         // TODO add your handling code here:
         this.dispose();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_OkButtonActionPerformed
 
     private void onDeleteStaff(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onDeleteStaff
         int selectedIndex = tbAnzeige.getSelectedRow();
         if (selectedIndex >= 0)
         {
             String sql = null;
-        SQLQuery query = null;
+            SQLQuery query = null;
         try {
             int uid = Integer.parseInt(tbAnzeige.getModel().getValueAt(selectedIndex, 0).toString());
             User user = new User(uid, tbAnzeige.getModel().getValueAt(selectedIndex, 1).toString(), tbAnzeige.getModel().getValueAt(selectedIndex, 2).toString(), tbAnzeige.getModel().getValueAt(selectedIndex, 3).toString(),
@@ -238,6 +238,7 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
             sql = "SELECT lid FROM lecture WHERE uid = " + uid;
             query = session.createSQLQuery(sql);
             List results = query.list();
+            
             for (Object o : results)
             {
                 int lid = (int) o;
@@ -245,6 +246,12 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
                 String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
                 String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
                 String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
+                String sqlCurriculum = "DELETE FROM curriculum_lecture WHERE lid = " + lid;
+                String sqlCourseTimes = "DELETE FROM course_day_time WHERE lid = " + lid;
+                query = session.createSQLQuery(sqlCourseTimes);
+                query.executeUpdate();
+                query = session.createSQLQuery(sqlCurriculum);
+                query.executeUpdate();
                 query = session.createSQLQuery(sqlCourse);
                 query.executeUpdate();
                 query = session.createSQLQuery(sqlEvent);
@@ -254,7 +261,9 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
                 query = session.createSQLQuery(sqlLect);
                 query.executeUpdate(); 
             }
+            
             session.getTransaction().commit();
+            session.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -305,10 +314,10 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton AddButton;
+    private javax.swing.JButton DeleteButton;
+    private javax.swing.JButton EditButton;
+    private javax.swing.JButton OkButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
