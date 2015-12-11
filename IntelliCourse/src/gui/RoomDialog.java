@@ -14,6 +14,7 @@ import java.awt.event.WindowListener;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -142,24 +143,23 @@ public class RoomDialog extends javax.swing.JDialog {
         AddRoomDialog ard = new AddRoomDialog(null, rootPaneCheckingEnabled);
         ard.setVisible(true);
         showFilteredData();
-        
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void onEdit(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onEdit
         int selectedIndex = tbRooms.getSelectedRow();
-        if (selectedIndex >= 0)
-        {
+        if (selectedIndex >= 0) {
             AddRoomDialog erd = new AddRoomDialog(null, rootPaneCheckingEnabled);
-        erd.setTitle("Edit Room");
+            erd.setTitle("Edit Room");
             erd.setEditMode();
-            Room room = new Room(Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 0).toString()), 
+            Room room = new Room(Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 0).toString()),
                     tbRooms.getModel().getValueAt(selectedIndex, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(selectedIndex, 2).toString()));
             erd.showRoom(room);
             erd.setVisible(true);
             showFilteredData();
         }
-        
-        
+
+
     }//GEN-LAST:event_onEdit
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -169,43 +169,52 @@ public class RoomDialog extends javax.swing.JDialog {
 
     private void onRemoveRoom(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onRemoveRoom
         int i = tbRooms.getSelectedRow();
-        if (i >= 0)
-        {
-        String sql = null;
-        SQLQuery query = null;
-        try {
-            int rid = Integer.parseInt(tbRooms.getModel().getValueAt(i, 0).toString());
-            Room room = new Room(rid, tbRooms.getModel().getValueAt(i, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(i, 2).toString()));
-            Session session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-            sql = "SELECT lid FROM lecture WHERE rid = " + rid;
-            query = session.createSQLQuery(sql);
-            List results = query.list();
-            for (Object o : results)
-            {
-                int lid = (int) o;
-                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
-                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
-                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
-                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
-                query = session.createSQLQuery(sqlCourse);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlEvent);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlStudLect);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlLect);
-                query.executeUpdate(); 
+        if (i >= 0) {
+            int sure = JOptionPane.showConfirmDialog(this, "Are you sure you want to do this?", "WARNING", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (sure == 0) {
+                String sql = null;
+                SQLQuery query = null;
+                try {
+                    int rid = Integer.parseInt(tbRooms.getModel().getValueAt(i, 0).toString());
+                    Room room = new Room(rid, tbRooms.getModel().getValueAt(i, 1).toString(), Integer.parseInt(tbRooms.getModel().getValueAt(i, 2).toString()));
+                    Session session = HibernateUtil.getSessionFactory().openSession();
+                    session.beginTransaction();
+                    sql = "SELECT lid FROM lecture WHERE rid = " + rid;
+                    query = session.createSQLQuery(sql);
+                    List results = query.list();
+                    for (Object o : results) {
+                        int lid = (int) o;
+
+                        String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                        String sqlEvent = "DELETE FROM event WHERE lid = " + lid;
+                        String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                        String sqlLect = "DELETE FROM lecture WHERE lid = " + lid;
+                        String sqlCurriculum = "DELETE FROM curriculum_lecture WHERE lid = " + lid;
+                        String sqlCourseTimes = "DELETE FROM course_day_time WHERE lid = " + lid;
+                        query = session.createSQLQuery(sqlCourseTimes);
+                        query.executeUpdate();
+                        query = session.createSQLQuery(sqlCurriculum);
+                        query.executeUpdate();
+                        query = session.createSQLQuery(sqlCourse);
+                        query.executeUpdate();
+                        query = session.createSQLQuery(sqlEvent);
+                        query.executeUpdate();
+                        query = session.createSQLQuery(sqlStudLect);
+                        query.executeUpdate();
+                        query = session.createSQLQuery(sqlLect);
+                        query.executeUpdate();
+                    }
+                    String sqlRoom = "DELETE FROM room WHERE rid = " + rid;
+                    query = session.createSQLQuery(sqlRoom);
+                    query.executeUpdate();
+                    session.getTransaction().commit();
+                    session.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                showFilteredData();
             }
-            String sqlRoom = "DELETE FROM room WHERE rid = " + rid;
-            query = session.createSQLQuery(sqlRoom);
-            query.executeUpdate();
-            session.getTransaction().commit();
-            session.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        showFilteredData();
         }
     }//GEN-LAST:event_onRemoveRoom
 
@@ -268,8 +277,6 @@ public class RoomDialog extends javax.swing.JDialog {
         }
 
     }
-
-
 
     private class MyDocumentListener implements DocumentListener {
 

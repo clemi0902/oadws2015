@@ -11,6 +11,7 @@ import intellicourse.util.HibernateUtil;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -20,6 +21,7 @@ import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+
 /**
  *
  * @author Clemens
@@ -37,7 +39,7 @@ public class CourseEventDialog extends javax.swing.JDialog {
         this.setTitle("Course - Event Menu");
         displayData();
     }
-    
+
     private void displayData() {
         String sql;
         sql = "select l.lid, l.name, l.beschreibung from Lecture as l "
@@ -50,9 +52,9 @@ public class CourseEventDialog extends javax.swing.JDialog {
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             SQLQuery q = session.createSQLQuery(query);
-            q.addScalar("lid",new IntegerType());
-            q.addScalar("name",new StringType());
-            q.addScalar("beschreibung",new StringType());
+            q.addScalar("lid", new IntegerType());
+            q.addScalar("name", new StringType());
+            q.addScalar("beschreibung", new StringType());
             q.setResultTransformer(Transformers.aliasToBean(Lecture.class));
             List<Lecture> resultList = q.list();
             displayResult(resultList);
@@ -69,15 +71,15 @@ public class CourseEventDialog extends javax.swing.JDialog {
         tableHead.add("Lid");
         tableHead.add("Name");
         tableHead.add("Beschreibung");
-        
+
         for (Object o : resultList) {
             Lecture lecture = new Lecture();
-            
+
             Lecture l = (Lecture) o;
             Vector<Object> row = new Vector<>();
             row.add(l.getLid());
             row.add(l.getName());
-            row.add(l.getBeschreibung());           
+            row.add(l.getBeschreibung());
             tableData.add(row);
         }
         tbAnzeigeCourse.setModel(new DefaultTableModel(tableData, tableHead));
@@ -178,7 +180,7 @@ public class CourseEventDialog extends javax.swing.JDialog {
         int id = Integer.parseInt(tbAnzeigeCourse.getValueAt(rowindex, 0).toString());
         String name = tbAnzeigeCourse.getValueAt(rowindex, 1).toString();
         String beschriftung = tbAnzeigeCourse.getValueAt(rowindex, 2).toString();
-        Lecture lecture = new Lecture(id,name,beschriftung);
+        Lecture lecture = new Lecture(id, name, beschriftung);
         acd.setLecture(lecture);
         acd.setIsAdd(false);
         acd.fillFields();
@@ -192,34 +194,42 @@ public class CourseEventDialog extends javax.swing.JDialog {
 
     private void onDelete(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onDelete
         int selectedIndex = tbAnzeigeCourse.getSelectedRow();
-        if (selectedIndex >= 0)
-        {
-            String sql = null;
-        SQLQuery query = null;
-        try {
-            int lid = Integer.parseInt(tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 0).toString());
-            Lecture lecture = new Lecture(lid, tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 1).toString(), tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 2).toString());
-            Session session = HibernateUtil.getSessionFactory().openSession();
-            session.beginTransaction();
-                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
-                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
-                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
-                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
-                query = session.createSQLQuery(sqlCourse);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlEvent);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlStudLect);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlLect);
-                query.executeUpdate(); 
-            
+        if (selectedIndex >= 0) {
+            int sure = JOptionPane.showConfirmDialog(this, "Are you sure you want to do this?", "WARNING", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (sure == 0) {
+                String sql = null;
+                SQLQuery query = null;
+                try {
+                    int lid = Integer.parseInt(tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 0).toString());
+                    Lecture lecture = new Lecture(lid, tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 1).toString(), tbAnzeigeCourse.getModel().getValueAt(selectedIndex, 2).toString());
+                    Session session = HibernateUtil.getSessionFactory().openSession();
+                    session.beginTransaction();
+                    String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                    String sqlEvent = "DELETE FROM event WHERE lid = " + lid;
+                    String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                    String sqlLect = "DELETE FROM lecture WHERE lid = " + lid;
+                    String sqlCurriculum = "DELETE FROM curriculum_lecture WHERE lid = " + lid;
+                    String sqlCourseTimes = "DELETE FROM course_day_time WHERE lid = " + lid;
+                    query = session.createSQLQuery(sqlCourseTimes);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlCurriculum);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlCourse);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlEvent);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlStudLect);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlLect);
+                    query.executeUpdate();
 
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        displayData();
+                    session.getTransaction().commit();
+                    session.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                displayData();
+            }
         }
     }//GEN-LAST:event_onDelete
 
@@ -296,6 +306,5 @@ public class CourseEventDialog extends javax.swing.JDialog {
             CourseEventDialog.this.displayData();
         }
 
-        
     }
 }
