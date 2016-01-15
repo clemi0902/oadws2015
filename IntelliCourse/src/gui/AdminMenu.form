@@ -47,7 +47,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridLayout">
         <Property name="columns" type="int" value="1"/>
-        <Property name="rows" type="int" value="6"/>
+        <Property name="rows" type="int" value="8"/>
       </Layout>
       <SubComponents>
         <Component class="javax.swing.JButton" name="jButton2">
@@ -64,6 +64,22 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton4ActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="studentbtn">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Edit Students"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="studentbtnActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="editadminbtn">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Edit Admins"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editadminbtnActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="jButton3">

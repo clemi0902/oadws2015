@@ -64,20 +64,20 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="AddButtonActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="DeleteButton">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Delete"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="onDeleteStaff"/>
-          </Events>
-        </Component>
         <Component class="javax.swing.JButton" name="EditButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="Edit"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="EditButtonActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="DeleteButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Delete"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="onDeleteStaff"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="OkButton">

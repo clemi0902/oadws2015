@@ -141,7 +141,7 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
     private void btOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btOkActionPerformed
         // TODO add your handling code here:
         
-       vorname = tfVorname.getText();
+        vorname = tfVorname.getText();
         nachname = tfNachname.getText();
         username = tfUsername.getText();
         password = pfPassword.getText();

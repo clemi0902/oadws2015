@@ -5,6 +5,7 @@
  */
 package gui;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.TableModel;
 
 /**
@@ -15,7 +16,7 @@ public class AdminMenu extends javax.swing.JFrame {
 
     
     
-     private int uid;
+    private int uid;
     
     public void setUid(int uid)
     {
@@ -43,6 +44,8 @@ public class AdminMenu extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        studentbtn = new javax.swing.JButton();
+        editadminbtn = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -52,7 +55,7 @@ public class AdminMenu extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setLayout(new java.awt.GridLayout(6, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(8, 1));
 
         jButton2.setText("Course/Event");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -69,6 +72,22 @@ public class AdminMenu extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jButton4);
+
+        studentbtn.setText("Edit Students");
+        studentbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                studentbtnActionPerformed(evt);
+            }
+        });
+        jPanel1.add(studentbtn);
+
+        editadminbtn.setText("Edit Admins");
+        editadminbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editadminbtnActionPerformed(evt);
+            }
+        });
+        jPanel1.add(editadminbtn);
 
         jButton3.setText("Room");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -143,6 +162,23 @@ public class AdminMenu extends javax.swing.JFrame {
         cd.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 
+    private void studentbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentbtnActionPerformed
+        // TODO add your handling code here:
+        EditStudentDialog es = new EditStudentDialog(this, rootPaneCheckingEnabled);
+        es.setVisible(true);
+    }//GEN-LAST:event_studentbtnActionPerformed
+
+    private void editadminbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editadminbtnActionPerformed
+        // TODO add your handling code here:
+        if(uid == 1) {
+            EditAdminDialog ea = new EditAdminDialog(this, rootPaneCheckingEnabled);
+            ea.setVisible(true);
+        }
+        else {
+            JOptionPane.showMessageDialog(rootPane, "Access denied!");
+        }
+    }//GEN-LAST:event_editadminbtnActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -180,6 +216,7 @@ public class AdminMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton editadminbtn;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -189,5 +226,6 @@ public class AdminMenu extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton studentbtn;
     // End of variables declaration//GEN-END:variables
 }

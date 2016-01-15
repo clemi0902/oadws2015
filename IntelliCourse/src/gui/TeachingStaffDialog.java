@@ -114,8 +114,8 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         tbAnzeige = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         AddButton = new javax.swing.JButton();
-        DeleteButton = new javax.swing.JButton();
         EditButton = new javax.swing.JButton();
+        DeleteButton = new javax.swing.JButton();
         OkButton = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         tfFilterUsername = new javax.swing.JTextField();
@@ -149,14 +149,6 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
         });
         jPanel1.add(AddButton);
 
-        DeleteButton.setText("Delete");
-        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                onDeleteStaff(evt);
-            }
-        });
-        jPanel1.add(DeleteButton);
-
         EditButton.setText("Edit");
         EditButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -164,6 +156,14 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
             }
         });
         jPanel1.add(EditButton);
+
+        DeleteButton.setText("Delete");
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onDeleteStaff(evt);
+            }
+        });
+        jPanel1.add(DeleteButton);
 
         OkButton.setText("Ok");
         OkButton.addActionListener(new java.awt.event.ActionListener() {
