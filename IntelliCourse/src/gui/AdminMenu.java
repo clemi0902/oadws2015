@@ -164,14 +164,14 @@ public class AdminMenu extends javax.swing.JFrame {
 
     private void studentbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentbtnActionPerformed
         // TODO add your handling code here:
-        EditStudentDialog es = new EditStudentDialog(this, rootPaneCheckingEnabled);
+        StudentDialog es = new StudentDialog(this, rootPaneCheckingEnabled);
         es.setVisible(true);
     }//GEN-LAST:event_studentbtnActionPerformed
 
     private void editadminbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editadminbtnActionPerformed
         // TODO add your handling code here:
         if(uid == 1) {
-            EditAdminDialog ea = new EditAdminDialog(this, rootPaneCheckingEnabled);
+            AdminDialog ea = new AdminDialog(this, rootPaneCheckingEnabled);
             ea.setVisible(true);
         }
         else {

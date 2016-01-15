@@ -12,11 +12,13 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 
@@ -24,12 +26,12 @@ import org.hibernate.type.IntegerType;
  *
  * @author Sandra
  */
-public class EditAdminDialog extends javax.swing.JDialog {
+public class AdminDialog extends javax.swing.JDialog {
 
     /**
      * Creates new form EditAdminDialog
      */
-    public EditAdminDialog(java.awt.Frame parent, boolean modal) {
+    public AdminDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.setTitle("Admin");
@@ -258,7 +260,27 @@ public class EditAdminDialog extends javax.swing.JDialog {
         // TODO add your handling code here:
         int rowindex = showadminTable.getSelectedRow();
         int id = Integer.parseInt(showadminTable.getValueAt(rowindex, 0).toString());
-                
+        
+        if (id == 1){
+            JOptionPane.showMessageDialog(null, "Could not delete master admin.");
+        }
+        else {
+            try {
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+                String sql = "DELETE FROM admin WHERE uid=" + id;
+                SQLQuery query = session.createSQLQuery(sql);
+                query.executeUpdate();
+                sql = "DELETE FROM user WHERE uid=" + id;
+                query = session.createSQLQuery(sql);
+                query.executeUpdate();
+                session.getTransaction().commit();
+                session.close();
+                displayData();
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Error: " + e);
+            }  
+        }
     }//GEN-LAST:event_DeletebtnActionPerformed
 
     
@@ -338,20 +360,21 @@ public class EditAdminDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(EditAdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(EditAdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(EditAdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(EditAdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AdminDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                EditAdminDialog dialog = new EditAdminDialog(new javax.swing.JFrame(), true);
+                AdminDialog dialog = new AdminDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -394,17 +417,17 @@ public class EditAdminDialog extends javax.swing.JDialog {
 
         @Override
         public void windowDeactivated(WindowEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
 
         @Override
         public void windowClosed(WindowEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
 
         @Override
         public void windowClosing(WindowEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
         
     }
@@ -413,17 +436,17 @@ public class EditAdminDialog extends javax.swing.JDialog {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            EditAdminDialog.this.displayData();
+            AdminDialog.this.displayData();
         }
     }
     
