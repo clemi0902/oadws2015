@@ -17,7 +17,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.StringType;
+//import jdk.nashorn.internal.runtime.regexp.joni.constants.StringType;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
@@ -238,30 +238,48 @@ public class TeachingStaffDialog extends javax.swing.JDialog {
             sql = "SELECT lid FROM lecture WHERE uid = " + uid;
             query = session.createSQLQuery(sql);
             List results = query.list();
-            
-            for (Object o : results)
+            if(results.size()  == 0)
             {
-                int lid = (int) o;
-                String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
-                String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
-                String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
-                String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
-                String sqlCurriculum = "DELETE FROM curriculum_lecture WHERE lid = " + lid;
-                String sqlCourseTimes = "DELETE FROM course_day_time WHERE lid = " + lid;
-                query = session.createSQLQuery(sqlCourseTimes);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlCurriculum);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlCourse);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlEvent);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlStudLect);
-                query.executeUpdate();
-                query = session.createSQLQuery(sqlLect);
+                String sqlStaff = "DELETE FROM staff WHERE uid = " + uid;
+                String sqlUser = "DELETE FROM user WHERE uid = " + uid;
+                query = session.createSQLQuery(sqlStaff);
                 query.executeUpdate(); 
+                query = session.createSQLQuery(sqlUser);
+                query.executeUpdate(); 
+
             }
-            
+            else
+            {
+                for (Object o : results)
+                {
+                    int lid = (int) o;
+                    String sqlCourse = "DELETE FROM course WHERE lid = " + lid;
+                    String sqlEvent =  "DELETE FROM event WHERE lid = " + lid;
+                    String sqlStudLect = "DELETE FROM student_lecture WHERE lid = " + lid;
+                    String sqlLect =  "DELETE FROM lecture WHERE lid = " + lid;
+                    String sqlCurriculum = "DELETE FROM curriculum_lecture WHERE lid = " + lid;
+                    String sqlCourseTimes = "DELETE FROM course_day_time WHERE lid = " + lid;
+                    String sqlStaff = "DELETE FROM staff WHERE uid = " + uid;
+                    String sqlUser = "DELETE FROM user WHERE uid = " + uid;
+                    
+                    query = session.createSQLQuery(sqlCourseTimes);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlCurriculum);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlCourse);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlEvent);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlStudLect);
+                    query.executeUpdate();
+                    query = session.createSQLQuery(sqlLect);
+                    query.executeUpdate();                   
+                    query = session.createSQLQuery(sqlStaff);
+                    query.executeUpdate(); 
+                    query = session.createSQLQuery(sqlUser);
+                    query.executeUpdate(); 
+                }
+            }            
             session.getTransaction().commit();
             session.close();
         } catch (Exception e) {

@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import javafx.scene.control.SelectionMode;
+//import javafx.scene.control.SelectionMode;
 import javax.swing.BorderFactory;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
