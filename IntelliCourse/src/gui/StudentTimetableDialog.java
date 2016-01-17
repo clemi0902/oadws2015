@@ -5,13 +5,24 @@
  */
 package gui;
 
+import intellicourse.util.HibernateUtil;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFormattedTextField;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -24,67 +35,6 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
 
     private int uid;
     private Properties p = new Properties();
-    private Object [][] data = { 
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""},
-    {"", "", "", "", "", "", ""}};
 
     public void setUid(int uid) {
         this.uid = uid;
@@ -102,6 +52,7 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         p.put("text.month", "Month");
         p.put("text.year", "Year");
         initComponents();
+        
         this.setTitle("Student Timetable");
     }
 
@@ -166,10 +117,105 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        ArrayList<Date> weekDates = getWeekDates();
+        Date dat;
+        Date vDat;
+        String mon, sun;
+        int zl = 0;
+        int sp = 0;
+        int i = 0;
+        long tag;
+       
+        SimpleDateFormat sdfToDate = new SimpleDateFormat("yyyy-MM-dd");
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+        List<Object> resultList = null;
+        try {
+            dat =  setStartDateToMonday();
+            mon = getDay(dat, 0);
+            sun = getDay(dat,6);
+            resultList = getData(mon, sun);
 
+            if (resultList != null) 
+            {
+                Iterator itr = resultList.iterator();
+                vDat = sdfToDate.parse(mon);
+                DefaultTableModel model = new DefaultTableModel();
+                model.addColumn(mon);
+                model.addRow(new Object[]{""});
+                while (itr.hasNext()) {
+                    Object[] o = (Object[]) itr.next();
+                    if(vDat.getTime() < sdfToDate.parse(String.valueOf(o[1])).getTime())
+                    {   
+                        tag = vDat.getTime() + 86400000;
+
+                        while(tag < sdfToDate.parse(String.valueOf(o[1])).getTime())
+                         {
+                             tag+= 86400000;
+                             model.addColumn(getDay(vDat, 1));
+                             sp++;                                
+                         } 
+
+                         vDat = sdfToDate.parse(String.valueOf(o[1]));
+                         model.addColumn(getDay(vDat, 0));
+                         sp++;
+                        
+                        zl = 0;
+                    }
+                    model.setValueAt("" + String.valueOf(o[2]) + " - " + String.valueOf(o[3]) + " " + String.valueOf(o[0]), zl, sp);
+                    zl++;
+                    if(model.getRowCount() <= zl)
+                    {
+                        model.addRow(new Object[]{""});
+                    }           
+                }
+                Date d = sdfToDate.parse(sun);
+                if(vDat.getTime() < d.getTime())
+                {
+                    tag = vDat.getTime() + 86400000;
+
+                    while(tag <= d.getTime())
+                     {
+                         tag+= 86400000;
+                         model.addColumn(getDay(vDat, 1));                              
+                     } 
+                }
+                jTable1.setModel(model);
+            }    
+        } catch (ParseException ex) {
+            Logger.getLogger(StudentTimetableDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       
+    }//GEN-LAST:event_jButton1ActionPerformed
+    private List<Object>  getData(String start, String end)
+    {
+        String QUERY = "SELECT DISTINCT l.name,cdt.day, cdt.von, cdt.bis FROM lecture l "
+                + "INNER JOIN course c USING (lid) "
+                + "INNER JOIN course_day_time cdt "
+                + "INNER JOIN student_lecture sl "
+                + "WHERE sl.uid = " + uid + " "
+                + " AND cdt.day >= '" + start + "'"
+                + " AND cdt.day <= '" + end + "'"
+                + " order by cdt.day, cdt.von, cdt.bis";
+        
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        List<Object> resultList = null;
+        if (!QUERY.equals("")) {
+            SQLQuery q = session.createSQLQuery(QUERY);
+            resultList = (List<Object>) q.list();
+        }
+        session.getTransaction().commit();
+        session.close();        
+        return resultList;        
+    }
+    
+    private String getDay(Date dat, Integer z)
+    {
+        DateFormat dfmt = new SimpleDateFormat( "yyyy-MM-dd" );
+        Calendar getDay = Calendar.getInstance();
+        getDay.setTime(dat);
+        getDay.add(Calendar.DAY_OF_YEAR,  z);
+        return dfmt.format(getDay.getTime()); 
+    }
     private void createList(ArrayList<Date> wd)
     {
         Date cd;
@@ -198,6 +244,23 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
             weekDates.add(c.getTime());
         }
         return weekDates;
+    }
+    
+    private Date setStartDateToMonday() throws ParseException {
+        JDatePickerImpl dpiDate = (JDatePickerImpl) jPanel1.getComponent(0);
+        Date startDate = (Date) dpiDate.getModel().getValue();
+        
+        Calendar getNextMonday = Calendar.getInstance();
+        getNextMonday.setTime(startDate);
+
+        int weekday = getNextMonday.get(Calendar.DAY_OF_WEEK);
+        if (weekday != Calendar.MONDAY) {
+            int days = ((Calendar.SATURDAY - weekday + 2) % 7);
+            getNextMonday.add(Calendar.DAY_OF_YEAR, days);
+            getNextMonday.add(Calendar.DAY_OF_YEAR,  -7);
+        }
+        Date date = getNextMonday.getTime();
+        return date;
     }
     
     /**
