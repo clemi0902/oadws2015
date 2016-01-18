@@ -5,12 +5,33 @@
  */
 package gui;
 
+import intellicourse.entity.Student;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.util.List;
+import javax.swing.JOptionPane;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+
 /**
  *
- * @author Sandra
+ * @author Jannik
  */
 public class AddStudentDialog extends javax.swing.JDialog {
 
+    private boolean isAdd;
+    private int editID;
+    private String vorname;
+    private String nachname;
+    private String adresse;
+    private int matnr;
+    private int semester;
+    private String username;
+    private String password;
+    private User user;
+    private Student student;
+    
     /**
      * Creates new form AddStudentDialog
      */
@@ -18,6 +39,10 @@ public class AddStudentDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
     }
+    
+    void setisAdd(boolean add) { this.isAdd = add; };
+    void setUser(User user) { this.user = user; };
+    void setStudent(Student st) { this.student = st; };
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,21 +53,197 @@ public class AddStudentDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        matrikelnrTxt = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        VornameTxt = new javax.swing.JTextField();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        NachnameTxt = new javax.swing.JTextField();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        AdresseTxt = new javax.swing.JTextField();
+        jPanel17 = new javax.swing.JPanel();
+        jPanel18 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        SemesterTxt = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        UsernameTxt = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jLabel8 = new javax.swing.JLabel();
+        PasswortTxt = new javax.swing.JPasswordField();
+        OkBtn = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        jPanel1.setLayout(new java.awt.GridLayout(8, 1));
+
+        jPanel5.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel6.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel1.setText("Matrikelnummer:");
+        jPanel6.add(jLabel1);
+        jPanel6.add(matrikelnrTxt);
+
+        jPanel5.add(jPanel6);
+
+        jPanel1.add(jPanel5);
+
+        jPanel7.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel8.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel5.setText("Vorname:");
+        jPanel8.add(jLabel5);
+        jPanel8.add(VornameTxt);
+
+        jPanel7.add(jPanel8);
+
+        jPanel1.add(jPanel7);
+
+        jPanel13.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel14.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel6.setText("Nachname:");
+        jPanel14.add(jLabel6);
+        jPanel14.add(NachnameTxt);
+
+        jPanel13.add(jPanel14);
+
+        jPanel1.add(jPanel13);
+
+        jPanel15.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel16.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel9.setText("Adresse:");
+        jLabel9.setToolTipText("");
+        jPanel16.add(jLabel9);
+        jPanel16.add(AdresseTxt);
+
+        jPanel15.add(jPanel16);
+
+        jPanel1.add(jPanel15);
+
+        jPanel17.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel18.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel11.setText("aktuelles Semester:");
+        jPanel18.add(jLabel11);
+        jPanel18.add(SemesterTxt);
+
+        jPanel17.add(jPanel18);
+
+        jPanel1.add(jPanel17);
+
+        jPanel9.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel10.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel7.setText("Username:");
+        jPanel10.add(jLabel7);
+        jPanel10.add(UsernameTxt);
+
+        jPanel9.add(jPanel10);
+
+        jPanel1.add(jPanel9);
+
+        jPanel11.setLayout(new java.awt.GridLayout(1, 2));
+
+        jPanel12.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel8.setText("Passwort:");
+        jPanel12.add(jLabel8);
+        jPanel12.add(PasswortTxt);
+
+        jPanel11.add(jPanel12);
+
+        jPanel1.add(jPanel11);
+
+        OkBtn.setText("Ok");
+        OkBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OkBtnActionPerformed(evt);
+            }
+        });
+        jPanel1.add(OkBtn);
+
+        jMenu1.setText("log out");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 372, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void OkBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OkBtnActionPerformed
+        // TODO add your handling code here:
+        vorname = VornameTxt.getText();
+        nachname = NachnameTxt.getText();
+        adresse = AdresseTxt.getText();
+        semester = Integer.parseInt(SemesterTxt.getText());
+        username = UsernameTxt.getText();
+        password = PasswortTxt.getText();
+
+        if(vorname.trim().equals("") ||nachname.trim().equals("")
+            || username.trim().equals("") || password.trim().equals("") 
+            || adresse.trim().equals("") || semester == 0)
+        {
+            JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
+
+        }
+        else if(isAdd == true)
+        {
+            addStudent();
+            this.dispose();
+        }
+        else {
+            editStudent(); System.out.println("here");
+            this.dispose();
+        }
+
+    }//GEN-LAST:event_OkBtnActionPerformed
 
     /**
      * @param args the command line arguments
@@ -87,5 +288,128 @@ public class AddStudentDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField AdresseTxt;
+    private javax.swing.JTextField NachnameTxt;
+    private javax.swing.JButton OkBtn;
+    private javax.swing.JPasswordField PasswortTxt;
+    private javax.swing.JTextField SemesterTxt;
+    private javax.swing.JTextField UsernameTxt;
+    private javax.swing.JTextField VornameTxt;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JLabel matrikelnrTxt;
     // End of variables declaration//GEN-END:variables
+
+    private void addStudent() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        
+        String sql;
+        User user = new User();
+        user.setVorname(vorname);
+        user.setNachname(nachname);
+        user.setUsername(username);
+        user.setPassword(password);
+        
+        sql = "from User where username like '" + username + "'";
+        Query q = session.createQuery(sql);
+        List resultList = q.list();
+        if(resultList.size() == 0){
+            session.save(user);
+            Student std = new Student(user, adresse, matnr, semester);
+            session.save(std);
+            session.getTransaction().commit();
+            this.setVisible(false);
+        }
+        else
+        {
+            JOptionPane.showMessageDialog(this, "User already exists", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void fillFields()
+    {
+        if(!isAdd)
+        {
+            editID = user.getUid();
+            vorname = user.getVorname();
+            nachname = user.getNachname();
+            username = user.getUsername();
+            password = user.getPassword();
+            matnr = student.getMatnr();
+            semester = student.getAktSemester();
+            adresse = student.getAdresse();
+            
+            matrikelnrTxt.setText(Integer.toString(matnr));
+            VornameTxt.setText(vorname);
+            NachnameTxt.setText(nachname);
+            AdresseTxt.setText(adresse);
+            SemesterTxt.setText(Integer.toString(semester));
+            UsernameTxt.setText(username);
+            PasswortTxt.setText(password);
+        }
+        else {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            String sql = "SELECT MAX(matnr) FROM student";
+            SQLQuery query = session.createSQLQuery(sql);
+            List result = query.list();
+            session.getTransaction().commit();
+            session.close();
+            
+            for (Object o : result) {
+                int tmp = (int) o;
+                if (matnr < tmp) {
+                    matnr = tmp;
+                }
+            }
+            matnr++;
+            matrikelnrTxt.setText(Integer.toString(matnr));
+        
+        }
+    }
+    
+    private void editStudent() { 
+        String sql;
+        try{
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            User u = new User(editID, UsernameTxt.getText(), PasswortTxt.getText(), VornameTxt.getText(), NachnameTxt.getText());
+            session.update(u);
+            semester = Integer.parseInt(SemesterTxt.getText());
+            sql = "update student set adresse=\"" + AdresseTxt.getText() + "\", akt_semester=\"" + semester + "\" Where uid=" + editID;
+            SQLQuery q = session.createSQLQuery(sql);
+            q.executeUpdate();
+            session.getTransaction().commit();
+            session.close();      
+             
+        }catch(Exception e){
+             
+            JOptionPane.showMessageDialog(null, "Error occured !");
+            e.printStackTrace();
+        }  
+    }
+
 }

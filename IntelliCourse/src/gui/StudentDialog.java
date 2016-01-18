@@ -1,3 +1,4 @@
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -5,9 +6,28 @@
  */
 package gui;
 
+import intellicourse.entity.Student;
+import intellicourse.entity.User;
+import intellicourse.util.HibernateUtil;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+
 /**
  *
- * @author Sandra
+ * @author Jannik
  */
 public class StudentDialog extends javax.swing.JDialog {
 
@@ -17,6 +37,12 @@ public class StudentDialog extends javax.swing.JDialog {
     public StudentDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setTitle("Student");
+        
+        filterVorname.getDocument().addDocumentListener(new MyDocumentListener());
+        filterNachname.getDocument().addDocumentListener(new MyDocumentListener());
+        filterUser.getDocument().addDocumentListener(new MyDocumentListener());
+        displayData();
     }
 
     /**
@@ -28,22 +54,261 @@ public class StudentDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel3 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        filterUser = new javax.swing.JTextField();
+        filterVorname = new javax.swing.JTextField();
+        filterNachname = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        showstudentTable = new javax.swing.JTable();
+        jPanel5 = new javax.swing.JPanel();
+        Addbtn = new javax.swing.JToggleButton();
+        EditBtn = new javax.swing.JToggleButton();
+        Deletebtn = new javax.swing.JToggleButton();
+        Okbtn = new javax.swing.JToggleButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        jPanel1.setLayout(new java.awt.GridLayout(2, 3));
+
+        jLabel2.setText("Username");
+        jPanel1.add(jLabel2);
+
+        jLabel3.setText("Vorname:");
+        jPanel1.add(jLabel3);
+
+        jLabel4.setText("Nachname");
+        jPanel1.add(jLabel4);
+
+        filterUser.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                filterUserActionPerformed(evt);
+            }
+        });
+        jPanel1.add(filterUser);
+        jPanel1.add(filterVorname);
+        jPanel1.add(filterNachname);
+
+        showstudentTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(showstudentTable);
+
+        jPanel5.setLayout(new java.awt.GridLayout(1, 4));
+
+        Addbtn.setText("Add");
+        Addbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AddbtnActionPerformed(evt);
+            }
+        });
+        jPanel5.add(Addbtn);
+
+        EditBtn.setText("Edit");
+        EditBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EditBtnActionPerformed(evt);
+            }
+        });
+        jPanel5.add(EditBtn);
+
+        Deletebtn.setText("Delete");
+        Deletebtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeletebtnActionPerformed(evt);
+            }
+        });
+        jPanel5.add(Deletebtn);
+
+        Okbtn.setText("Ok");
+        Okbtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OkbtnActionPerformed(evt);
+            }
+        });
+        jPanel5.add(Okbtn);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 377, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
+
+        getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        jMenu1.setText("log out");
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void filterUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_filterUserActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_filterUserActionPerformed
+
+    private void AddbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddbtnActionPerformed
+        // TODO add your handling code here:
+        AddStudentDialog as = new AddStudentDialog(null, rootPaneCheckingEnabled);
+        as.addWindowListener(new MyWindowAdapter());
+        as.setisAdd(true);
+        as.setTitle("Add Student");
+        as.fillFields();
+        as.setVisible(true);
+
+    }//GEN-LAST:event_AddbtnActionPerformed
+
+    private void EditBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EditBtnActionPerformed
+        AddStudentDialog as = new AddStudentDialog(null, rootPaneCheckingEnabled);
+        as.setTitle("Edit Student");
+        int rowindex = showstudentTable.getSelectedRow();
+        int id = Integer.parseInt(showstudentTable.getValueAt(rowindex, 0).toString());
+        String username = showstudentTable.getValueAt(rowindex, 1).toString();
+        String  password= showstudentTable.getValueAt(rowindex, 4).toString();
+        String vorname = showstudentTable.getValueAt(rowindex, 2).toString();
+        String nachname = showstudentTable.getValueAt(rowindex, 3).toString();
+        String adresse = showstudentTable.getValueAt(rowindex, 5).toString();
+        String matnr = showstudentTable.getValueAt(rowindex, 6).toString();
+        String aktSemester = showstudentTable.getValueAt(rowindex, 7).toString();
+        User user = new User(id,username,password,vorname,nachname);
+        Student student = new Student(user, adresse, Integer.parseInt(matnr), Integer.parseInt(aktSemester));
+        as.setUser(user);
+        as.setStudent(student);
+        as.setisAdd(false);
+        as.fillFields();
+        as.setVisible(true);
+        displayData();
+
+    }//GEN-LAST:event_EditBtnActionPerformed
+
+    private void DeletebtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeletebtnActionPerformed
+        // TODO add your handling code here:
+        int rowindex = showstudentTable.getSelectedRow();
+        int id = Integer.parseInt(showstudentTable.getValueAt(rowindex, 0).toString());
+
+        if (id == 1){
+            JOptionPane.showMessageDialog(null, "Could not delete master admin.");
+        }
+        else {
+            try {
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+                String sql = "DELETE FROM student WHERE uid=" + id;
+                SQLQuery query = session.createSQLQuery(sql);
+                query.executeUpdate();
+                sql = "DELETE FROM user WHERE uid=" + id;
+                query = session.createSQLQuery(sql);
+                query.executeUpdate();
+                session.getTransaction().commit();
+                session.close();
+                displayData();
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Error: " + e);
+            }
+        }
+    }//GEN-LAST:event_DeletebtnActionPerformed
+
+    private void OkbtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OkbtnActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_OkbtnActionPerformed
+
+    private void displayData() {
+        String hql;
+        if (filterUser.getText().trim().equals("") && filterVorname.getText().trim().equals("") && filterNachname.getText().trim().equals("")) {
+            hql = "select u from User u inner join u.student as s";
+        } else
+            hql = "select u from User u inner join u.student as s"
+                    + "WHERE UPPER(u.username) LIKE '" + filterUser.getText().trim().toUpperCase() + "%' "
+                    + "AND UPPER(u.vorname) LIKE '" + filterVorname.getText().trim().toUpperCase() + "%' "
+                    + "AND UPPER(u.nachname) LIKE '" + filterNachname.getText().trim().toUpperCase() + "%'";
+        executeQuery(hql);
+    }
+    
+    private void executeQuery(String query) {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery(query);
+            List<User> resultList = q.list();
+            displayResult(resultList);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+    
+    private void displayResult(List resultList) {
+        Vector<String> tableHead = new Vector<>();
+        Vector tableData = new Vector();
+        tableHead.add("uid");
+        tableHead.add("Username");
+        tableHead.add("First Name");
+        tableHead.add("Last Name");
+        tableHead.add("Password");
+        tableHead.add("Address");
+        tableHead.add("Matrikelnumber");
+        tableHead.add("Actual Semester");
+        
+        for (Object o : resultList) {
+            User u = (User) o;
+            Student s = u.getStudent();
+            
+            Vector<Object> row = new Vector<>();
+            row.add(u.getUid());
+            row.add(u.getUsername());
+            row.add(u.getVorname());
+            row.add(u.getNachname());
+            row.add(u.getPassword());
+            row.add(s.getAdresse());
+            row.add(s.getMatnr());
+            row.add(s.getAktSemester());
+            tableData.add(row);
+        }
+        showstudentTable.setModel(new DefaultTableModel(tableData, tableHead));
+
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -90,5 +355,61 @@ public class StudentDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton Addbtn;
+    private javax.swing.JToggleButton Deletebtn;
+    private javax.swing.JToggleButton EditBtn;
+    private javax.swing.JToggleButton Okbtn;
+    private javax.swing.JTextField filterNachname;
+    private javax.swing.JTextField filterUser;
+    private javax.swing.JTextField filterVorname;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable showstudentTable;
     // End of variables declaration//GEN-END:variables
+
+
+private  class MyWindowAdapter extends WindowAdapter {
+
+        @Override
+        public void windowDeactivated(WindowEvent e) {
+            StudentDialog.this.displayData();
+        }
+
+        @Override
+        public void windowClosed(WindowEvent e) {
+            StudentDialog.this.displayData();
+        }
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            StudentDialog.this.displayData();
+        }
+        
+    }
+    
+    private class MyDocumentListener implements DocumentListener {
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            StudentDialog.this.displayData();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            StudentDialog.this.displayData();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            StudentDialog.this.displayData();
+        }
+    }
+    
 }
