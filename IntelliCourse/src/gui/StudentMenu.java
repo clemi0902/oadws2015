@@ -5,6 +5,7 @@
  */
 package gui;
 
+import intellicourse.entity.Curriculum;
 import intellicourse.entity.Lecture;
 import intellicourse.entity.Room;
 import intellicourse.util.HibernateUtil;
@@ -45,6 +46,8 @@ public class StudentMenu extends javax.swing.JFrame {
         tfName.getDocument().addDocumentListener(new TfChangeListener());
         cbCourse.addActionListener(new MyCbChangeListener());
         cbEvent.addActionListener(new MyCbChangeListener());
+        curriculumBox.addActionListener(new MyCBoxListener());
+        initCurriculaBox();
         displayLectures();
         
         this.setTitle("Student Menu");
@@ -68,8 +71,11 @@ public class StudentMenu extends javax.swing.JFrame {
         jPanel4 = new javax.swing.JPanel();
         tfName = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
-        cbCourse = new javax.swing.JCheckBox();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
         cbEvent = new javax.swing.JCheckBox();
+        cbCourse = new javax.swing.JCheckBox();
+        curriculumBox = new javax.swing.JComboBox<>();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbRegistered = new javax.swing.JTable();
@@ -91,7 +97,7 @@ public class StudentMenu extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
         jPanel5.add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
-        jPanel2.setLayout(new java.awt.GridLayout());
+        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
 
         jPanel4.setLayout(new java.awt.BorderLayout());
         jPanel4.add(tfName, java.awt.BorderLayout.CENTER);
@@ -100,15 +106,25 @@ public class StudentMenu extends javax.swing.JFrame {
 
         jPanel2.add(jPanel4);
 
-        jPanel3.setLayout(new java.awt.GridLayout(2, 0));
+        jPanel3.setLayout(new java.awt.GridLayout(1, 2));
 
-        cbCourse.setSelected(true);
-        cbCourse.setText("Course");
-        jPanel3.add(cbCourse);
+        jPanel8.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel9.setLayout(new java.awt.GridLayout(1, 2));
 
         cbEvent.setSelected(true);
         cbEvent.setText("Event");
-        jPanel3.add(cbEvent);
+        jPanel9.add(cbEvent);
+
+        cbCourse.setSelected(true);
+        cbCourse.setText("Course");
+        jPanel9.add(cbCourse);
+
+        jPanel8.add(jPanel9);
+
+        jPanel8.add(curriculumBox);
+
+        jPanel3.add(jPanel8);
 
         jPanel2.add(jPanel3);
 
@@ -197,6 +213,32 @@ public class StudentMenu extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_onLogOut
 
+    
+    private void initCurriculaBox()
+    {
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            Query q = session.createQuery("from Curriculum ");
+            showCurriculaBox(q.list());
+            session.getTransaction().commit();
+            session.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }        
+    }
+    
+    private void showCurriculaBox(List result) {
+        curriculumBox.addItem("select curriculum");
+        
+        for (Object o : result) {
+            Curriculum c = (Curriculum) o;
+            String tmp = c.getName();
+            curriculumBox.addItem(tmp);
+        }
+        
+    }
+    
     private void unregister(int index)
     {
         int lid = Integer.parseInt(tbRegistered.getValueAt(index, 0).toString());
@@ -273,20 +315,30 @@ public class StudentMenu extends javax.swing.JFrame {
     
     private void displayLectures() {
         String QUERY = "";
+        
+        String curricula = curriculumBox.getSelectedItem().toString();
+
+        if(curricula.equals("select curriculum")){
+            curricula = "WHERE ";
+        }
+        else {
+            curricula = "INNER JOIN curriculum_lecture cl USING(lid) INNER JOIN curriculum cu USING(cid) WHERE cu.name=\"" + curricula + "\" AND ";
+        }
+        
         if (cbCourse.isSelected() && cbEvent.isSelected()) {
-            QUERY = "SELECT * FROM lecture "
-                    + "WHERE preference = 0 AND "
-                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+            QUERY = "SELECT l.* FROM lecture l " + curricula
+                    + "l.preference = 0 AND "
+                    + "UPPER(l.name) LIKE '" + tfName.getText().toUpperCase() + "%'";
         } else if (cbCourse.isSelected() && !cbEvent.isSelected()) {
-            QUERY = "SELECT * FROM lecture "
-                    + "INNER JOIN course USING(lid) "
-                    + "WHERE preference = 0 AND "
-                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+            QUERY = "SELECT l.* FROM lecture l "
+                    + "INNER JOIN course co USING(lid) " + curricula
+                    + "l.preference = 0 AND "
+                    + "UPPER(l.name) LIKE '" + tfName.getText().toUpperCase() + "%'";
         } else if (!cbCourse.isSelected() && cbEvent.isSelected()) {
-            QUERY = "SELECT * FROM lecture "
-                    + "INNER JOIN event USING(lid) "
-                    + "WHERE preference = 0 AND "
-                    + "UPPER(name) LIKE '" + tfName.getText().toUpperCase() + "%'";
+            QUERY = "SELECT l.* FROM lecture l "
+                    + "INNER JOIN event e USING(lid) " + curricula
+                    + "l.preference = 0 AND "
+                    + "UPPER(l.name) LIKE '" + tfName.getText().toUpperCase() + "%'";
         }
         executeQuery(QUERY);
 
@@ -327,15 +379,6 @@ public class StudentMenu extends javax.swing.JFrame {
                 tableData.add(row);
             }
         }
-//        for (Object o : resultList) {
-//            Lecture l = (Lecture) o;
-//            
-//            Vector<Object> row = new Vector<>();
-//            row.add(l.getLid());
-//            row.add(l.getName());
-//            row.add(l.getBeschreibung());
-//            tableData.add(row);
-//        }
         tbLectures.setModel(new DefaultTableModel(tableData, tableHead));
 
     }
@@ -380,6 +423,7 @@ public class StudentMenu extends javax.swing.JFrame {
     private javax.swing.JButton btUnregister;
     private javax.swing.JCheckBox cbCourse;
     private javax.swing.JCheckBox cbEvent;
+    private javax.swing.JComboBox<String> curriculumBox;
     private javax.swing.JButton jButton2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
@@ -390,6 +434,8 @@ public class StudentMenu extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tbLectures;
@@ -422,6 +468,17 @@ public class StudentMenu extends javax.swing.JFrame {
         }
     }
 
+    private class MyCBoxListener implements ActionListener {
+        
+        public MyCBoxListener() {
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            StudentMenu.this.displayLectures();
+        }
+    }
+    
     private class MyCbChangeListener implements ActionListener {
 
         public MyCbChangeListener() {
