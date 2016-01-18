@@ -129,7 +129,7 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         
         List<Object> resultList = null;
         try {
-            dat =  setStartDateToMonday();
+            dat =  setDate2Mon();
             mon = getDay(dat, 0);
             sun = getDay(dat,6);
             resultList = getData(mon, sun);
@@ -188,13 +188,13 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
     private List<Object>  getData(String start, String end)
     {
         String QUERY = "SELECT DISTINCT l.name,cdt.day, cdt.von, cdt.bis FROM lecture l "
-                + "INNER JOIN course c USING (lid) "
-                + "INNER JOIN course_day_time cdt "
-                + "INNER JOIN student_lecture sl "
-                + "WHERE sl.uid = " + uid + " "
+                + " INNER JOIN student_lecture sl on (l.lid = sl.lid) "
+                + " INNER JOIN course c ON (l.lid = c.lid) "
+                + " INNER JOIN course_day_time cdt ON (c.lid = cdt.lid) "
+                + " WHERE sl.uid = " + uid + " "
                 + " AND cdt.day >= '" + start + "'"
                 + " AND cdt.day <= '" + end + "'"
-                + " order by cdt.day, cdt.von, cdt.bis";
+                + " ORDER BY cdt.day, cdt.von, cdt.bis";
         
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
@@ -216,50 +216,21 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
         getDay.add(Calendar.DAY_OF_YEAR,  z);
         return dfmt.format(getDay.getTime()); 
     }
-    private void createList(ArrayList<Date> wd)
-    {
-        Date cd;
-        java.sql.Date sqlDate = null;
-        String courseSql = "SELECT cdt.von AS vonzeit, cdt.bis AS biszeit FROM lecture l "
-                + "INNER JOIN course c USING (lid) "
-                + "INNER JOIN course_day_time cdt "
-                + "INNER JOIN student_lecture sl "
-                + "WHERE sl.uid = " + uid + " "
-                + "AND cdt.day = '" + sqlDate + "'";
-    }
     
-    private ArrayList<Date> getWeekDates()
-    {
-        ArrayList <Date> weekDates = new ArrayList<>();
-        JDatePickerImpl dpiDate = (JDatePickerImpl) jPanel1.getComponent(0);
-        Date chosenDate = (Date) dpiDate.getModel().getValue();
-        Calendar c = Calendar.getInstance();
-        c.setTime(chosenDate);
-        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        int diff = 0 - dayOfWeek + 1;
-        for (int i = 0; i < 7; i++)
-        {
-            c.setTime(chosenDate);
-            c.add(Calendar.DATE, diff + i);
-            weekDates.add(c.getTime());
-        }
-        return weekDates;
-    }
-    
-    private Date setStartDateToMonday() throws ParseException {
+    private Date setDate2Mon() throws ParseException {
         JDatePickerImpl dpiDate = (JDatePickerImpl) jPanel1.getComponent(0);
         Date startDate = (Date) dpiDate.getModel().getValue();
         
-        Calendar getNextMonday = Calendar.getInstance();
-        getNextMonday.setTime(startDate);
+        Calendar monday = Calendar.getInstance();
+        monday.setTime(startDate);
 
-        int weekday = getNextMonday.get(Calendar.DAY_OF_WEEK);
+        int weekday = monday.get(Calendar.DAY_OF_WEEK);
         if (weekday != Calendar.MONDAY) {
             int days = ((Calendar.SATURDAY - weekday + 2) % 7);
-            getNextMonday.add(Calendar.DAY_OF_YEAR, days);
-            getNextMonday.add(Calendar.DAY_OF_YEAR,  -7);
+            monday.add(Calendar.DAY_OF_YEAR, days);
+            monday.add(Calendar.DAY_OF_YEAR,  -7);
         }
-        Date date = getNextMonday.getTime();
+        Date date = monday.getTime();
         return date;
     }
     
