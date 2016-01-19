@@ -5,6 +5,7 @@
  */
 package gui;
 
+import beans.Kryptographie;
 import beans.UserData;
 import intellicourse.util.HibernateUtil;
 import java.util.List;
@@ -162,6 +163,8 @@ public class Login extends javax.swing.JFrame {
 
     private boolean checkAdminLogin() {
         List resultList = null;
+        //Kryptographie k = new Kryptographie();
+        //String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT a.uid from Admin a "
                     + "WHERE a.uid = (SELECT u2.uid "
@@ -185,6 +188,8 @@ public class Login extends javax.swing.JFrame {
 
     private boolean checkStudentLogin() {
         List resultList = null;
+        //Kryptographie k = new Kryptographie();
+        //String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT s.uid from Student s "
                     + "WHERE s.uid = (SELECT u2.uid "
@@ -208,6 +213,8 @@ public class Login extends javax.swing.JFrame {
 
     private boolean checkStaffLogin() {
         List resultList = null;
+        //Kryptographie k = new Kryptographie();
+        //String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT s.uid from Staff s "
                     + "WHERE s.uid = (SELECT u2.uid "
