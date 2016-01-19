@@ -189,9 +189,10 @@ public class StudentMenu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        StudentTimetableDialog std = new StudentTimetableDialog(this, rootPaneCheckingEnabled);
-        std.setUid(uid);
-        std.setVisible(true);
+        TimetableDialog td = new TimetableDialog(this, rootPaneCheckingEnabled);
+        td.setIsStudent(true);
+        td.setUid(uid);
+        td.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRegisterActionPerformed

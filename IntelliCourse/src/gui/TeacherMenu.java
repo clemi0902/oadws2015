@@ -35,40 +35,27 @@ public class TeacherMenu extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanel3 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setLayout(new java.awt.GridLayout(1, 0));
-
-        jButton4.setText("<=");
-        jPanel1.add(jButton4);
-
-        jButton5.setText("=>");
-        jPanel1.add(jButton5);
-
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jTable1.setModel(new TeacherTimeTableModel()
-        );
-        jScrollPane1.setViewportView(jTable1);
-
-        jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        jPanel3.setLayout(new java.awt.GridLayout(1, 3));
+        jButton2.setText("Show Timetable");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton2, java.awt.BorderLayout.CENTER);
 
         jButton1.setText("Add Preference");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -76,11 +63,11 @@ public class TeacherMenu extends javax.swing.JFrame {
                 jButton1ActionPerformed(evt);
             }
         });
-        jPanel3.add(jButton1);
+        jPanel2.add(jButton1, java.awt.BorderLayout.PAGE_END);
 
-        jButton2.setText("Show Timetable");
-        jPanel3.add(jButton2);
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
+        jPanel3.setLayout(new java.awt.GridLayout(1, 3));
         getContentPane().add(jPanel3, java.awt.BorderLayout.SOUTH);
 
         jMenu1.setText("Log out");
@@ -106,6 +93,14 @@ public class TeacherMenu extends javax.swing.JFrame {
     private void onLogOut(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_onLogOut
         System.exit(0);
     }//GEN-LAST:event_onLogOut
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        TimetableDialog td = new TimetableDialog(this, rootPaneCheckingEnabled);
+        td.setIsStudent(false);
+        td.setUid(uid);
+        td.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -145,14 +140,10 @@ public class TeacherMenu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 }

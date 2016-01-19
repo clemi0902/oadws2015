@@ -31,22 +31,28 @@ import org.jdatepicker.impl.UtilDateModel;
  *
  * @author Clemens
  */
-public class StudentTimetableDialog extends javax.swing.JDialog {
+public class TimetableDialog extends javax.swing.JDialog {
 
     private int uid;
+    private boolean isStudent;
     private Properties p = new Properties();
 
     public void setUid(int uid) {
         this.uid = uid;
-        this.setVisible(true);
+        //this.setVisible(true);
     }
+
+    public void setIsStudent(boolean isStudent) {
+        this.isStudent = isStudent;
+    }
+    
     /**
      * Creates new form StudentTimetableDialog
      */
     
     
     
-    public StudentTimetableDialog(java.awt.Frame parent, boolean modal) {
+    public TimetableDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         p.put("text.today", "Today");
         p.put("text.month", "Month");
@@ -181,21 +187,33 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
                 jTable1.setModel(model);
             }    
         } catch (ParseException ex) {
-            Logger.getLogger(StudentTimetableDialog.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TimetableDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
        
     }//GEN-LAST:event_jButton1ActionPerformed
     private List<Object>  getData(String start, String end)
     {
-        String QUERY = "SELECT DISTINCT l.name,cdt.day, cdt.von, cdt.bis FROM lecture l "
-                + " INNER JOIN student_lecture sl on (l.lid = sl.lid) "
-                + " INNER JOIN course c ON (l.lid = c.lid) "
-                + " INNER JOIN course_day_time cdt ON (c.lid = cdt.lid) "
-                + " WHERE sl.uid = " + uid + " "
+        String QUERY = "";
+        if(isStudent == true){
+            QUERY = "SELECT DISTINCT l.name,cdt.day, cdt.von, cdt.bis FROM lecture l "
+                    + " INNER JOIN student_lecture sl on (l.lid = sl.lid) "
+                    + " INNER JOIN course c ON (l.lid = c.lid) "
+                    + " INNER JOIN course_day_time cdt ON (c.lid = cdt.lid) "
+                    + " WHERE sl.uid = " + uid + " "
+                    + " AND cdt.day >= '" + start + "'"
+                    + " AND cdt.day <= '" + end + "'"
+                    + " ORDER BY cdt.day, cdt.von, cdt.bis";
+        }
+        else
+        {
+            QUERY = "SELECT DISTINCT l.name,cdt.day, cdt.von, cdt.bis "
+                + " FROM lecture l INNER JOIN course c ON(l.lid =  c.lid) "
+                + " INNER JOIN course_day_time cdt ON(c.lid = cdt.lid) "
+                + " WHERE l.uid = " + uid + " "
                 + " AND cdt.day >= '" + start + "'"
                 + " AND cdt.day <= '" + end + "'"
                 + " ORDER BY cdt.day, cdt.von, cdt.bis";
-        
+        }
         Session session = HibernateUtil.getSessionFactory().openSession();
         session.beginTransaction();
         List<Object> resultList = null;
@@ -251,20 +269,21 @@ public class StudentTimetableDialog extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(StudentTimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(StudentTimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(StudentTimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(StudentTimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TimetableDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                StudentTimetableDialog dialog = new StudentTimetableDialog(new javax.swing.JFrame(), true);
+                TimetableDialog dialog = new TimetableDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
