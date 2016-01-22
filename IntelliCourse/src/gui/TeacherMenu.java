@@ -99,6 +99,7 @@ public class TeacherMenu extends javax.swing.JFrame {
         TimetableDialog td = new TimetableDialog(this, rootPaneCheckingEnabled);
         td.setIsStudent(false);
         td.setUid(uid);
+        td.setTitle("Teacher timetable");
         td.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 

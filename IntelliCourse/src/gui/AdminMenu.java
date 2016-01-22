@@ -48,14 +48,13 @@ public class AdminMenu extends javax.swing.JFrame {
         editadminbtn = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setLayout(new java.awt.GridLayout(8, 1));
+        jPanel1.setLayout(new java.awt.GridLayout(7, 1));
 
         jButton2.setText("Course/Event");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -73,7 +72,7 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(jButton4);
 
-        studentbtn.setText("Edit Students");
+        studentbtn.setText(" Students");
         studentbtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 studentbtnActionPerformed(evt);
@@ -81,7 +80,7 @@ public class AdminMenu extends javax.swing.JFrame {
         });
         jPanel1.add(studentbtn);
 
-        editadminbtn.setText("Edit Admins");
+        editadminbtn.setText("Admins");
         editadminbtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editadminbtnActionPerformed(evt);
@@ -104,9 +103,6 @@ public class AdminMenu extends javax.swing.JFrame {
             }
         });
         jPanel1.add(jButton1);
-
-        jButton5.setText("Show/Adapt Schedule");
-        jPanel1.add(jButton5);
 
         jButton6.setText("Curricula");
         jButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -221,7 +217,6 @@ public class AdminMenu extends javax.swing.JFrame {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;

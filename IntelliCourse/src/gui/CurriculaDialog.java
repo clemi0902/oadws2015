@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -84,7 +85,7 @@ public class CurriculaDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jbAddCurricula);
 
-        jbRemoveCurricula.setText("Remove");
+        jbRemoveCurricula.setText("Delete");
         jbRemoveCurricula.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jbRemoveCurriculaActionPerformed(evt);
@@ -126,10 +127,31 @@ public class CurriculaDialog extends javax.swing.JDialog {
 
     private void jbRemoveCurriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRemoveCurriculaActionPerformed
         // TODO add your handling code here:
-        
-        
+        deleteCurricula();
+               
     }//GEN-LAST:event_jbRemoveCurriculaActionPerformed
 
+    private void deleteCurricula() {
+        int rowindex = table.getSelectedRow();
+        int cid = Integer.parseInt(table.getValueAt(rowindex, 0).toString());
+        
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+            String sql = "DELETE FROM curriculum_lecture WHERE cid=" + cid;
+            SQLQuery query = session.createSQLQuery(sql);
+            query.executeUpdate();
+            sql = "DELETE FROM curriculum WHERE cid=" + cid;
+            query = session.createSQLQuery(sql);
+            query.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+            displayData();
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Error: " + e);
+        }
+    }
+    
     private void jbEditCurriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbEditCurriculaActionPerformed
         // TODO add your handling code here:
         AddCurriculumDialog acd = new AddCurriculumDialog(null, rootPaneCheckingEnabled);

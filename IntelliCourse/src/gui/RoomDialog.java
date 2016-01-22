@@ -79,7 +79,7 @@ public class RoomDialog extends javax.swing.JDialog {
         });
         jPanel1.add(jButton1);
 
-        jButton2.setText("Remove");
+        jButton2.setText("Delete");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 onRemoveRoom(evt);
