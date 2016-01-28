@@ -6,11 +6,18 @@
 package gui;
 
 //import beans.Kryptographie;
+import beans.Kryptographie;
 import beans.UserData;
 import intellicourse.util.HibernateUtil;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.ComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -127,6 +134,8 @@ public class Login extends javax.swing.JFrame {
 
         switch (cbUser.getSelectedIndex()) {
             case 0:
+        {
+            try {
                 if (checkStudentLogin()) {
                     StudentMenu sm = new StudentMenu();
                     sm.setUid(uid);
@@ -135,9 +144,25 @@ public class Login extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
                 break;
             case 1:
+        {
+            try {
                 if (checkStaffLogin()) {
                     TeacherMenu tm = new TeacherMenu();
                     tm.setUid(uid);
@@ -146,9 +171,25 @@ public class Login extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
                 break;
             case 2:
+        {
+            try {
                 if (checkAdminLogin()) {
                     AdminMenu am = new AdminMenu();
                     am.setUid(uid);
@@ -157,19 +198,34 @@ public class Login extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(this, "Login failed!", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
                 break;
         }
     }//GEN-LAST:event_btOkActionPerformed
 
-    private boolean checkAdminLogin() {
+    private boolean checkAdminLogin() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, UnsupportedEncodingException {
         List resultList = null;
-        //Kryptographie k = new Kryptographie();
-        //String pw = k.encrypt(tfPassword.getText());
+        Kryptographie k = new Kryptographie();
+        String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT a.uid from Admin a "
                     + "WHERE a.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
-                    + "AND password LIKE '" + tfPassword.getText() + "')";
+                    //+ "AND password LIKE '" + tfPassword.getText() + "')";
+                    + "AND password LIKE '" + pw + "')";
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             Query q = session.createQuery(query);
@@ -186,15 +242,16 @@ public class Login extends javax.swing.JFrame {
         }
     }
 
-    private boolean checkStudentLogin() {
+    private boolean checkStudentLogin() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, UnsupportedEncodingException {
         List resultList = null;
-        //Kryptographie k = new Kryptographie();
-        //String pw = k.encrypt(tfPassword.getText());
+        Kryptographie k = new Kryptographie();
+        String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT s.uid from Student s "
                     + "WHERE s.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
-                    + "AND password LIKE '" + tfPassword.getText() + "')";
+                    //+ "AND password LIKE '" + tfPassword.getText() + "')";
+                    + "AND password LIKE '" + pw + "')";
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             Query q = session.createQuery(query);
@@ -211,15 +268,16 @@ public class Login extends javax.swing.JFrame {
         }
     }
 
-    private boolean checkStaffLogin() {
+    private boolean checkStaffLogin() throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, UnsupportedEncodingException {
         List resultList = null;
-        //Kryptographie k = new Kryptographie();
-        //String pw = k.encrypt(tfPassword.getText());
+        Kryptographie k = new Kryptographie();
+        String pw = k.encrypt(tfPassword.getText());
         try {
             String query = "SELECT s.uid from Staff s "
                     + "WHERE s.uid = (SELECT u2.uid "
                     + "FROM User u2 WHERE u2.username LIKE '" + tfUsername.getText() + "' "
-                    + "AND password LIKE '" + tfPassword.getText() + "')";
+                    //+ "AND password LIKE '" + tfPassword.getText() + "')";
+                    + "AND password LIKE '" + pw + "')";
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             Query q = session.createQuery(query);

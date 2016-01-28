@@ -5,6 +5,7 @@
  */
 package gui;
 
+import beans.Kryptographie;
 import intellicourse.entity.Student;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
@@ -396,7 +397,9 @@ public class AddStudentDialog extends javax.swing.JDialog {
         try{
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            User u = new User(editID, UsernameTxt.getText(), PasswortTxt.getText(), VornameTxt.getText(), NachnameTxt.getText());
+            Kryptographie k = new Kryptographie();
+            String pw = k.encrypt(PasswortTxt.getText());
+            User u = new User(editID, UsernameTxt.getText(), pw , VornameTxt.getText(), NachnameTxt.getText());
             session.update(u);
             semester = Integer.parseInt(SemesterTxt.getText());
             sql = "update student set adresse=\"" + AdresseTxt.getText() + "\", akt_semester=\"" + semester + "\" Where uid=" + editID;

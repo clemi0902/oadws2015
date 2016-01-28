@@ -5,6 +5,7 @@
  */
 package gui;
 
+import beans.Kryptographie;
 import intellicourse.entity.Staff;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
@@ -175,7 +176,9 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         try{
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            User user = new User(Integer.parseInt(tfID.getText()), tfUsername.getText(), pfPassword.getText(), tfVorname.getText(), tfNachname.getText());
+            Kryptographie k = new Kryptographie();
+            String pw = k.encrypt(pfPassword.getText());
+            User user = new User(Integer.parseInt(tfID.getText()), tfUsername.getText(),pw , tfVorname.getText(), tfNachname.getText());
             session.update(user);
 //            sql = "from User where username like '" + username + "'";
 //            Query q = session.createQuery(sql);

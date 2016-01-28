@@ -5,6 +5,7 @@
  */
 package gui;
 
+import beans.Kryptographie;
 import intellicourse.entity.Admin;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
@@ -347,7 +348,9 @@ public class AddAdminDialog extends javax.swing.JDialog {
         try{
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            User user = new User(editID, UsernameTxt.getText(), PasswortTxt.getText(), VornameTxt.getText(), NachnameTxt.getText());
+            Kryptographie k = new Kryptographie();
+            String pw = k.encrypt(PasswortTxt.getText());
+            User user = new User(editID, UsernameTxt.getText(),pw , VornameTxt.getText(), NachnameTxt.getText());
             session.update(user);
             session.getTransaction().commit();
             session.close();      
