@@ -9,7 +9,15 @@ import beans.Kryptographie;
 import intellicourse.entity.Admin;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JOptionPane;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -210,16 +218,32 @@ public class AddAdminDialog extends javax.swing.JDialog {
         vorname = VornameTxt.getText();
         nachname = NachnameTxt.getText();
         username = UsernameTxt.getText();
-        password = PasswortTxt.getText();
+        String pw = PasswortTxt.getText();
         
         if(vorname.trim().equals("") ||nachname.trim().equals("") 
-                || username.trim().equals("") ||password.trim().equals("") )
+                || username.trim().equals("") ||pw.trim().equals("") )
         {
             JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
            
         }
         else if(isAdd == true)
         {
+            Kryptographie k = new Kryptographie();
+            try {
+                password = k.encrypt(pw);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(AddAdminDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
             addAdmin();
             this.dispose();
         }

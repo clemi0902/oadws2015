@@ -9,7 +9,15 @@ import beans.Kryptographie;
 import intellicourse.entity.Student;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JOptionPane;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -26,7 +34,7 @@ public class AddStudentDialog extends javax.swing.JDialog {
     private String vorname;
     private String nachname;
     private String adresse;
-    private int matnr;
+    private int matnr = 0;
     private int semester;
     private String username;
     private String password;
@@ -215,7 +223,7 @@ public class AddStudentDialog extends javax.swing.JDialog {
 
     private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
         // TODO add your handling code here:
-        System.exit(0);
+        this.dispose();
     }//GEN-LAST:event_jMenu1ActionPerformed
 
     private void OkBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OkBtnActionPerformed
@@ -225,10 +233,10 @@ public class AddStudentDialog extends javax.swing.JDialog {
         adresse = AdresseTxt.getText();
         semester = Integer.parseInt(SemesterTxt.getText());
         username = UsernameTxt.getText();
-        password = PasswortTxt.getText();
+        String pw = PasswortTxt.getText();
 
         if(vorname.trim().equals("") ||nachname.trim().equals("")
-            || username.trim().equals("") || password.trim().equals("") 
+            || username.trim().equals("") || pw.trim().equals("") 
             || adresse.trim().equals("") || semester == 0)
         {
             JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
@@ -236,6 +244,22 @@ public class AddStudentDialog extends javax.swing.JDialog {
         }
         else if(isAdd == true)
         {
+            Kryptographie k = new Kryptographie();
+            try {
+                password = k.encrypt(pw);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(AddStudentDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
             addStudent();
             this.dispose();
         }

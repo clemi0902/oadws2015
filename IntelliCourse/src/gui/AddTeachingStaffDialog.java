@@ -9,7 +9,15 @@ import beans.Kryptographie;
 import intellicourse.entity.Staff;
 import intellicourse.entity.User;
 import intellicourse.util.HibernateUtil;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import org.hibernate.HibernateException;
@@ -145,17 +153,34 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         vorname = tfVorname.getText();
         nachname = tfNachname.getText();
         username = tfUsername.getText();
-        password = pfPassword.getText();
+        String pw = pfPassword.getText();
         if(vorname.trim().equals("") ||nachname.trim().equals("") 
-                || username.trim().equals("") ||password.trim().equals("") )
+                || username.trim().equals("") ||pw.trim().equals("") )
         {
             JOptionPane.showMessageDialog(this, "Incorrect Input","Error",JOptionPane.ERROR_MESSAGE);
            
         }
         else
         {
+            Kryptographie k = new Kryptographie();
+            try {
+                password = k.encrypt(pw);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchPaddingException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalBlockSizeException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (BadPaddingException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvalidKeyException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedEncodingException ex) {
+                Logger.getLogger(AddTeachingStaffDialog.class.getName()).log(Level.SEVERE, null, ex);
+            }
             if(isAdd)
             {
+                
                 addStaff();
             }
             else
@@ -176,9 +201,7 @@ public class AddTeachingStaffDialog extends javax.swing.JDialog {
         try{
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            Kryptographie k = new Kryptographie();
-            String pw = k.encrypt(pfPassword.getText());
-            User user = new User(Integer.parseInt(tfID.getText()), tfUsername.getText(),pw , tfVorname.getText(), tfNachname.getText());
+            User user = new User(Integer.parseInt(tfID.getText()), tfUsername.getText(),password , tfVorname.getText(), tfNachname.getText());
             session.update(user);
 //            sql = "from User where username like '" + username + "'";
 //            Query q = session.createQuery(sql);

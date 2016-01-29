@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.swing.event.ChangeEvent;
@@ -40,14 +41,14 @@ import org.jdatepicker.impl.UtilDateModel;
 public class AddPreferenceDialog extends javax.swing.JDialog {
 
     private CourseDayDialog cdd;
-    private Object[][] data ={ 
-    {"Monday", "08:00", "08:00", false},
-    {"Tuesday", "08:00", "08:00", false},
-    {"Wednesday", "08:00", "08:00", false},
-    {"Thursday", "08:00", "08:00", false},
-    {"Friday", "08:00", "08:00", false},
-    {"Saturday", "08:00", "08:00", false},
-    {"Sunday", "08:00", "08:00", false}};
+    private Object[][] data = {
+        {"Monday", "08:00", "08:00", false},
+        {"Tuesday", "08:00", "08:00", false},
+        {"Wednesday", "08:00", "08:00", false},
+        {"Thursday", "08:00", "08:00", false},
+        {"Friday", "08:00", "08:00", false},
+        {"Saturday", "08:00", "08:00", false},
+        {"Sunday", "08:00", "08:00", false}};
     private Lecture lecture = null;
     private Room room = null;
     private Properties p = new Properties();
@@ -69,7 +70,7 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         cdd = new CourseDayDialog(null, false);
         cdd.setData(data);
         cdd.setModalityType(ModalityType.MODELESS);
-        
+
         this.setModalityType(ModalityType.MODELESS);
 
         initComponents();
@@ -256,53 +257,73 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(begin);
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
-
-        Object[][] oL = cdd.getTimeList();
-        String updateLectSql = "UPDATE lecture "
-                + "SET rid = " + room.getRid() + ", "
-                + "uid = " + uid + ", "
-                + "preference = 1, "
-                + "priority = " + jComboBox1.getSelectedItem().toString() + " "
-                + "WHERE lid = " + lecture.getLid();
-        query = session.createSQLQuery(updateLectSql);
-        query.executeUpdate();
         if (buttonGroup1.getSelection().getActionCommand().equals("Course")) {
-            java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
-            java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
-            String updateCourseSql = "UPDATE course "
-                    + "SET startDat = '" + sqlBegin + "', "
-                    + "endDat = '" + sqlEnd + "' "
-                    + "WHERE lid = " + lecture.getLid();
-            query = session.createSQLQuery(updateCourseSql);
-            query.executeUpdate();
-            while (gc.getTime().before(end)) {
-                String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-                for (int k = 0; k < oL.length; k++) {
-                    if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
-                        try {
-                            String vonStr = oL[k][1] + "";
-                            String bisStr = oL[k][2] + "";
-                            Date von = format.parse(vonStr);
-                            java.sql.Date sqlVon = new java.sql.Date(von.getTime());
-                            Date bis = format.parse(bisStr);
-                            java.sql.Date sqlBis = new java.sql.Date(bis.getTime());
-                            java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
-                            java.sql.Time sqlVonTime = new Time(von.getTime());
-                            java.sql.Time sqlBisTime = new Time(bis.getTime());
-                            String statement = "INSERT INTO course_day_time "
-                                    + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
-                            query = session.createSQLQuery(statement);
-                            query.executeUpdate();
-                        } catch (ParseException ex) {
-                            Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+            if (checkDates(begin, end)) {
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+
+                Object[][] oL = cdd.getTimeList();
+                String updateLectSql = "UPDATE lecture "
+                        + "SET rid = " + room.getRid() + ", "
+                        + "uid = " + uid + ", "
+                        + "preference = 1, "
+                        + "priority = " + jComboBox1.getSelectedItem().toString() + " "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createSQLQuery(updateLectSql);
+                query.executeUpdate();
+                java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
+                java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
+                String updateCourseSql = "UPDATE course "
+                        + "SET startDat = '" + sqlBegin + "', "
+                        + "endDat = '" + sqlEnd + "' "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createSQLQuery(updateCourseSql);
+                query.executeUpdate();
+                while (gc.getTime().before(end)) {
+                    String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+                    for (int k = 0; k < oL.length; k++) {
+                        if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
+                            try {
+                                String vonStr = oL[k][1] + "";
+                                String bisStr = oL[k][2] + "";
+                                Date von = format.parse(vonStr);
+                                java.sql.Date sqlVon = new java.sql.Date(von.getTime());
+                                Date bis = format.parse(bisStr);
+                                java.sql.Date sqlBis = new java.sql.Date(bis.getTime());
+                                java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
+                                java.sql.Time sqlVonTime = new Time(von.getTime());
+                                java.sql.Time sqlBisTime = new Time(bis.getTime());
+                                String statement = "INSERT INTO course_day_time "
+                                        + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
+                                query = session.createSQLQuery(statement);
+                                query.executeUpdate();
+                            } catch (ParseException ex) {
+                                Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
+                    gc.add(Calendar.DATE, 1);
                 }
-                gc.add(Calendar.DATE, 1);
+                session.getTransaction().commit();
+                session.close();
+                cdd.dispose();
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "You can only choose a course within one semester", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+
+            Object[][] oL = cdd.getTimeList();
+            String updateLectSql = "UPDATE lecture "
+                    + "SET rid = " + room.getRid() + ", "
+                    + "uid = " + uid + ", "
+                    + "preference = 1, "
+                    + "priority = " + jComboBox1.getSelectedItem().toString() + " "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateLectSql);
+            query.executeUpdate();
             java.sql.Date sqlDate = new java.sql.Date(begin.getTime());
             Date beginTime = (Date) jSpinner1.getModel().getValue();
             Date endTime = (Date) jSpinner2.getModel().getValue();
@@ -316,12 +337,31 @@ public class AddPreferenceDialog extends javax.swing.JDialog {
                     + "WHERE lid = " + lecture.getLid();
             query = session.createSQLQuery(updateEventSql);
             query.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+            cdd.dispose();
+            this.dispose();
         }
-        session.getTransaction().commit();
-        session.close();
-        cdd.dispose();
-        this.dispose();
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private boolean checkDates(Date start, Date end) {
+        if (start.getMonth() >= 2 && start.getMonth() <= 5) {
+            if (start.getYear() != end.getYear()) {
+                return false;
+            } else if (end.getMonth() < 2 || end.getMonth() > 5) {
+                return false;
+            }
+        } else if (start.getMonth() >= 9 || start.getMonth() <= 1) {
+            if (start.getYear() != end.getYear() && end.getYear() - start.getYear() != 1) {
+                return false;
+            } else if (end.getMonth() < 9 && end.getMonth() > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         cdd.dispose();

@@ -5,6 +5,8 @@
  */
 package gui;
 
+import intellicourse.entity.Course;
+import intellicourse.entity.CourseDayTime;
 import intellicourse.entity.Event;
 import intellicourse.entity.Lecture;
 import intellicourse.entity.Room;
@@ -16,6 +18,7 @@ import java.sql.Time;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -25,11 +28,16 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimeType;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
@@ -39,23 +47,22 @@ import org.jdatepicker.impl.UtilDateModel;
  * @author Clemens
  */
 public class AssignCourseDialog extends javax.swing.JDialog {
+
     private CourseDayDialog cdd = new CourseDayDialog(null, true);
     private Properties p = new Properties();
     private User staff = null;
     private Lecture lecture = null;
     private Room room = null;
     boolean isCourse = true;
-    private Object[][] data ={ 
-    {"Monday", "08:00", "08:00", false},
-    {"Tuesday", "08:00", "08:00", false},
-    {"Wednesday", "08:00", "08:00", false},
-    {"Thursday", "08:00", "08:00", false},
-    {"Friday", "08:00", "08:00", false},
-    {"Saturday", "08:00", "08:00", false},
-    {"Sunday", "08:00", "08:00", false}};
+    private Object[][] data = {
+        {"Monday", "08:00", "08:00", false},
+        {"Tuesday", "08:00", "08:00", false},
+        {"Wednesday", "08:00", "08:00", false},
+        {"Thursday", "08:00", "08:00", false},
+        {"Friday", "08:00", "08:00", false},
+        {"Saturday", "08:00", "08:00", false},
+        {"Sunday", "08:00", "08:00", false}};
 
-    
-    
     /**
      * Creates new form AddCourseEventDialog
      */
@@ -273,58 +280,93 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         JDatePickerImpl dpiEnd = (JDatePickerImpl) jPanel8.getComponent(0);
         DateFormat format = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         Date begin = (Date) dpiBegin.getModel().getValue();
+
         Date end = (Date) dpiEnd.getModel().getValue();
         GregorianCalendar gc = new GregorianCalendar();
+        GregorianCalendar help = new GregorianCalendar();
         gc.setTime(begin);
+        help.setTime(begin);
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
-
-        Object[][] oL = cdd.getTimeList();
-        String updateLectSql = "UPDATE lecture "
-                + "SET rid = " + room.getRid() + ", "
-                + "uid = " + staff.getUid() + ", "
-                + "preference = 0 "
-                + "WHERE lid = " + lecture.getLid();
-        query = session.createSQLQuery(updateLectSql);
-        query.executeUpdate();
         if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
-            java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
-            java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
-            String updateCourseSql = "UPDATE course "
-                    + "SET startDat = '" + sqlBegin + "', "
-                    + "endDat = '" + sqlEnd + "' "
-                    + "WHERE lid = " + lecture.getLid();
-            query = session.createSQLQuery(updateCourseSql);
-            query.executeUpdate();
-            String delStatement = "DELETE FROM course_day_time "
-                    + "WHERE lid = " + lecture.getLid();
-            query = session.createSQLQuery(delStatement);
-            query.executeUpdate();
-            while (gc.getTime().before(end)) {
-                String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
-                for (int k = 0; k < oL.length; k++) {
-                    if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
-                        try {
-                            String vonStr = oL[k][1] + "";
-                            String bisStr = oL[k][2] + "";
-                            Date von = format.parse(vonStr);
-                            java.sql.Date sqlVon = new java.sql.Date(von.getTime());
-                            Date bis = format.parse(bisStr);
-                            java.sql.Date sqlBis = new java.sql.Date(bis.getTime());
-                            java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
-                            java.sql.Time sqlVonTime = new Time(von.getTime());
-                            java.sql.Time sqlBisTime = new Time(bis.getTime());
-                            String statement = "INSERT INTO course_day_time "
-                                    + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
-                            query = session.createSQLQuery(statement);
-                            query.executeUpdate();
-                        } catch (ParseException ex) {
-                            Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+            if (checkDates(begin, end)) {
+                Object[][] oL = cdd.getTimeList();
+                //-----------------------------------------------------------------------------------------
+                while (help.getTime().before(end)) {
+                    String dayName = help.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+                    for (int k = 0; k < oL.length; k++) {
+                        if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
+                            try {
+                                String vonStr = oL[k][1] + "";
+                                String bisStr = oL[k][2] + "";
+                                Date von = format.parse(vonStr);
+                                Date bis = format.parse(bisStr);
+                                java.sql.Date sqlDate = new java.sql.Date(help.getTimeInMillis());
+                                java.sql.Time sqlVonTime = new Time(von.getTime());
+                                java.sql.Time sqlBisTime = new Time(bis.getTime());
+                                if (!checkCourseDateTime(room.getRid(), von, bis, sqlDate) || !checkEventDateTime(room.getRid(), von, bis, sqlDate)) {
+                                    JOptionPane.showMessageDialog(this, "The room is already taken by another course/event", "Error", JOptionPane.ERROR_MESSAGE);
+                                    return;
+                                }
+                            } catch (ParseException ex) {
+                                Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
                     }
+                    help.add(Calendar.DATE, 1);
                 }
-                gc.add(Calendar.DATE, 1);
+                //-----------------------------------------------------------------------------------------
+
+                Session session = HibernateUtil.getSessionFactory().openSession();
+                session.beginTransaction();
+
+                String updateLectSql = "UPDATE lecture "
+                        + "SET rid = " + room.getRid() + ", "
+                        + "uid = " + staff.getUid() + ", "
+                        + "preference = 0 "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createSQLQuery(updateLectSql);
+                query.executeUpdate();
+                java.sql.Date sqlBegin = new java.sql.Date(begin.getTime());
+                java.sql.Date sqlEnd = new java.sql.Date(end.getTime());
+                String updateCourseSql = "UPDATE course "
+                        + "SET startDat = '" + sqlBegin + "', "
+                        + "endDat = '" + sqlEnd + "' "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createSQLQuery(updateCourseSql);
+                query.executeUpdate();
+                String delStatement = "DELETE FROM course_day_time "
+                        + "WHERE lid = " + lecture.getLid();
+                query = session.createSQLQuery(delStatement);
+                query.executeUpdate();
+                while (gc.getTime().before(end)) {
+                    String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+                    for (int k = 0; k < oL.length; k++) {
+                        if (oL[k][0].equals(dayName) && (boolean) oL[k][3]) {
+                            try {
+                                String vonStr = oL[k][1] + "";
+                                String bisStr = oL[k][2] + "";
+                                Date von = format.parse(vonStr);
+                                Date bis = format.parse(bisStr);
+                                java.sql.Date sqlDate = new java.sql.Date(gc.getTimeInMillis());
+                                java.sql.Time sqlVonTime = new Time(von.getTime());
+                                java.sql.Time sqlBisTime = new Time(bis.getTime());
+                                String statement = "INSERT INTO course_day_time "
+                                        + "VALUES (" + lecture.getLid() + ",'" + sqlDate + "','" + sqlVonTime + "','" + sqlBisTime + "')";
+                                query = session.createSQLQuery(statement);
+                                query.executeUpdate();
+                            } catch (ParseException ex) {
+                                Logger.getLogger(AddPreferenceDialog.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                    gc.add(Calendar.DATE, 1);
+                }
+                session.getTransaction().commit();
+                session.close();
+                cdd.dispose();
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "You can only add a course within one semester", "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             java.sql.Date sqlDate = new java.sql.Date(begin.getTime());
@@ -333,6 +375,24 @@ public class AssignCourseDialog extends javax.swing.JDialog {
 
             java.sql.Time sqlBeginTime = new Time(beginTime.getTime());
             java.sql.Time sqlEndTime = new Time(endTime.getTime());
+
+            if (!checkEventDateTime(room.getRid(), beginTime, endTime, sqlDate) || !(checkCourseDateTime(room.getRid(), beginTime, endTime, sqlDate))) {
+                JOptionPane.showMessageDialog(this, "The room is already taken by another course/event", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            session.beginTransaction();
+
+            Object[][] oL = cdd.getTimeList();
+            String updateLectSql = "UPDATE lecture "
+                    + "SET rid = " + room.getRid() + ", "
+                    + "uid = " + staff.getUid() + ", "
+                    + "preference = 0 "
+                    + "WHERE lid = " + lecture.getLid();
+            query = session.createSQLQuery(updateLectSql);
+            query.executeUpdate();
+
             String updateEventSql = "UPDATE event "
                     + "SET datum = '" + sqlDate + "', "
                     + "von = '" + sqlBeginTime + "', "
@@ -340,13 +400,76 @@ public class AssignCourseDialog extends javax.swing.JDialog {
                     + "WHERE lid = " + lecture.getLid();
             query = session.createSQLQuery(updateEventSql);
             query.executeUpdate();
+            session.getTransaction().commit();
+            session.close();
+            cdd.dispose();
+            this.dispose();
         }
-        session.getTransaction().commit();
-        session.close();
-        cdd.dispose();
-        this.dispose();
+
+
     }//GEN-LAST:event_btOkActionPerformed
 
+    private boolean checkCourseDateTime(int rid, Date fromTime, Date toTime, java.sql.Date date) {
+        java.sql.Time von = new java.sql.Time(fromTime.getTime());
+        java.sql.Time bis = new java.sql.Time(toTime.getTime());
+
+        String checkSQL = "SELECT l.lid "
+                + "FROM course c INNER JOIN lecture l USING (lid) "
+                + "INNER JOIN course_day_time cdt USING (lid) "
+                + "WHERE l.rid = " + rid + " AND "
+                + "l.preference IS NOT 1 AND "
+                + "cdt.day = '" + date + "' AND "
+                + "cdt.von BETWEEN '" + von + "' AND '" + bis + "' OR "
+                + "cdt.bis BETWEEN '" + von + "' AND '" + bis + "'";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        SQLQuery q = session.createSQLQuery(checkSQL);
+        List results = q.list();
+        for (Object o : results) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkEventDateTime(int rid, Date fromTime, Date toTime, java.sql.Date date) {
+        java.sql.Time von = new java.sql.Time(fromTime.getTime());
+        java.sql.Time bis = new java.sql.Time(toTime.getTime());
+
+        String checkSQL = "SELECT l.lid "
+                + "FROM event e INNER JOIN lecture l USING (lid) "
+                + "WHERE l.rid = " + rid + " AND "
+                + "AND l.preference IS NOT 1 AND "
+                + "e.datum = '" + date + "' AND "
+                + "e.von BETWEEN '" + von + "' AND '" + bis + "' OR "
+                + "e.bis BETWEEN '" + von + "' AND '" + bis + "'";
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+        SQLQuery q = session.createSQLQuery(checkSQL);
+        List results = q.list();
+        for (Object o : results) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkDates(Date start, Date end) {
+        if (start.getMonth() >= 2 && start.getMonth() <= 5) {
+            if (start.getYear() != end.getYear()) {
+                return false;
+            } else if (end.getMonth() < 2 || end.getMonth() > 5) {
+                return false;
+            }
+        } else if (start.getMonth() >= 9 || start.getMonth() <= 1) {
+            if (start.getYear() != end.getYear() && end.getYear() - start.getYear() != 1) {
+                return false;
+            } else if (end.getMonth() < 9 && end.getMonth() > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
     private void btCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelActionPerformed
         cdd.dispose();
         this.dispose();
@@ -378,64 +501,233 @@ public class AssignCourseDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btShowPreferencesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btShowPreferencesActionPerformed
-        String sql = null;
-        SQLQuery sqlQuery = null;
-        Query query = null;
-        if (lecture != null)
-        {
+        String getPref = "SELECT l.lid "
+                + "FROM lecture l "
+                + "WHERE l.lid = " + lecture.getLid() + " AND "
+                + "l.uid = " + staff.getUid() + " AND "
+                + "l.preference = 1";
+        if (lecture != null && staff != null) {
             Session session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
-            String getLectureQuery = "from lecture INNER JOIN l.course as course USING (lid) "
-                    + "WHERE lid = " + lecture.getLid() + " "
-                    + "AND preference = 1";
-            query = session.createQuery(getLectureQuery);
-            List returns = query.list();
-            String getLectureQuery2 = "from lecture INNER JOIN event USING (lid) "
-                    + "WHERE lid = " + lecture.getLid() + " "
-                    + "AND preference = 1";
-                query = session.createQuery(getLectureQuery2);
-                List returnsEv = query.list();
-            if (returns.size()> 0)
-            {
-                String getRoomQuery = "from room "
-                    + "WHERE rid = " + returns.get(3);
-                String getUserQuery = "from user "
-                    + "WHERE uid = " + returns.get(4);
-                String getCourseQuery = "from course "
-                        + "WHERE lid = " + lecture.getLid();
-                String getCourseDayTimeQuery = "from course_day_time "
-                        + "WHERE lid = " + lecture.getLid();
-                query = session.createQuery(getRoomQuery);
-                List roomResult = query.list();
-                query = session.createQuery(getUserQuery);
-                List userResult = query.list();
-                query = session.createQuery(getCourseQuery);
-                List courseResult = query.list();
-                query = session.createQuery(getCourseDayTimeQuery);
-                List courseDayTimeResult = query.list();
+            SQLQuery q = session.createSQLQuery(getPref);
+            List result = q.list();
+            for (Object o : result) {
+                int prefLID = (int) o;
+                String lectureQuery = "SELECT * "
+                        + "FROM lecture "
+                        + "WHERE lid = :lid";
+                q = session.createSQLQuery(lectureQuery);
+                q.setParameter("lid", prefLID);
+                ArrayList<Lecture> least = (ArrayList<Lecture>) q.list();
+                String roomSelect = "SELECT r.rid, r.name, r.anzSitzplatz "
+                        + "FROM room r INNER JOIN lecture l USING (rid) "
+                        + "WHERE l.lid = " + lecture.getLid();
+                q = session.createSQLQuery(roomSelect);
+                q.addScalar("rid", new IntegerType());
+                q.addScalar("name", new StringType());
+                q.addScalar("anzSitzplatz", new IntegerType());
+                q.setResultTransformer(Transformers.aliasToBean(Room.class));
+                room = (Room) q.list().get(0);
+                tfRoom.setText(room.getName());
+                if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
+                    JDatePickerImpl dpiBegin = (JDatePickerImpl) jPanel3.getComponent(0);
+                    JDatePickerImpl dpiEnd = (JDatePickerImpl) jPanel8.getComponent(0);
+                    String getCourseQuery = "SELECT c.lid, c.kursnr, c.startDat, c.endDat FROM course c "
+                            + "WHERE c.lid = " + lecture.getLid();
+                    q = session.createSQLQuery(getCourseQuery);
+                    q.addScalar("lid", new IntegerType());
+                    q.addScalar("kursnr", new IntegerType());
+                    q.addScalar("startDat", new DateType());
+                    q.addScalar("endDat", new DateType());
+                    
+                    q.setResultTransformer(Transformers.aliasToBean(Course.class));
+
+//                    List<?> courses = q.list();
+//                    Course course = (Course) courses.get(0);
+                    Course course = (Course) q.list().get(0);
+                    dpiBegin.getModel().setDate(course.getStartDat().getYear() + 1900, course.getStartDat().getMonth() + 1, course.getStartDat().getDay() + 1);
+                    dpiBegin.getModel().setSelected(true);
+                    dpiEnd.getModel().setDate(course.getEndDat().getYear() + 1900, course.getEndDat().getMonth() + 1, course.getEndDat().getDay() + 1);
+                    dpiEnd.getModel().setSelected(true);
+                    String getCourseDayTimeQuery = "SELECT cdt.lid, cdt.day, cdt.von, cdt.bis "
+                            + "FROM course_day_time cdt "
+                            + "WHERE lid = " + lecture.getLid();
+                    q = session.createSQLQuery(getCourseDayTimeQuery);
+                    q.addScalar("lid", new IntegerType());
+                    q.addScalar("day", new DateType());
+                    q.addScalar("von", new TimeType());
+                    q.addScalar("bis", new TimeType());
+                    
+                    q.setResultTransformer(Transformers.aliasToBean(CourseDayTime.class));
+                    ArrayList<CourseDayTime> cdts = (ArrayList<CourseDayTime>) q.list();
+
+                    cdd.setData(getTimeChooseModel(cdts));
+
+                } else {
+                    JDatePickerImpl dpiBegin = (JDatePickerImpl) jPanel3.getComponent(0);
+                    String eventQuery = "SELECT e.lid, e.eventnr, e.datum, e.von, e.bis "
+                            + "FROM event e "
+                            + "WHERE lid = " + prefLID;
+                    q = session.createSQLQuery(eventQuery);
+                    q.addScalar("lid", new IntegerType());
+                    q.addScalar("eventnr", new IntegerType());
+                    q.addScalar("datum", new DateType());
+                    q.addScalar("von", new TimeType());
+                    q.addScalar("bis", new TimeType());
+                    q.setResultTransformer(Transformers.aliasToBean(Event.class));
+                    List events = q.list();
+                    Event event = null;
+                    for (Object o2 : events) {
+                        event = (Event) o2;
+
+                    }
+
+                    Date datum = event.getDatum();
+                    Date von = event.getVon();
+                    Date bis = event.getBis();
+                    dpiBegin.getModel().setDate(datum.getYear() + 1900, datum.getMonth() + 1, datum.getDay() + 1);
+                    dpiBegin.getModel().setSelected(true);
+                    timeSpinner.getModel().setValue(von);
+                    timeSpinner2.getModel().setValue(bis);
+
+                }
+
             }
-            if (returnsEv.size() > 0)
-            {
-                String getRoomQuery = "from room "
-                    + "WHERE rid = " + returns.get(3);
-                String getUserQuery = "from user "
-                    + "WHERE uid = " + returns.get(4);
-                String getEventQuery = "from event "
-                        + "WHERE lid = " + lecture.getLid();
-                query = session.createQuery(getRoomQuery);
-                List roomResult = query.list();
-                query = session.createQuery(getUserQuery);
-                List userResult = query.list();
-                query = session.createQuery(getEventQuery);
-                List eventResult = query.list();
-                room = new Room((Integer)roomResult.get(0), (String)roomResult.get(1), (int) roomResult.get(2));
-                staff = new User((Integer) userResult.get(0), (String) userResult.get(1), (String) userResult.get(2), (String) userResult.get(3), (String) userResult.get(4));
-                Event event = new Event(lecture, 0, (Date)eventResult.get(2), (Date)eventResult.get(3), (Date)eventResult.get(4));
-            }
-            
-            
         }
+//        String sql = null;
+//        SQLQuery sqlQuery = null;
+//        Query query = null;
+//        if (lecture != null) {
+//            Session session = HibernateUtil.getSessionFactory().openSession();
+//            session.beginTransaction();
+//            String getLectureQuery = "from lecture INNER JOIN l.course as course USING (lid) "
+//                    + "WHERE lid = " + lecture.getLid() + " "
+//                    + "AND preference = 1";
+//            query = session.createQuery(getLectureQuery);
+//            List returns = query.list();
+//            String getLectureQuery2 = "from lecture INNER JOIN event USING (lid) "
+//                    + "WHERE lid = " + lecture.getLid() + " "
+//                    + "AND preference = 1";
+//            query = session.createQuery(getLectureQuery2);
+//            List returnsEv = query.list();
+//            if (returns.size() > 0) {
+//                String getRoomQuery = "from room "
+//                        + "WHERE rid = " + returns.get(3);
+//                String getUserQuery = "from user "
+//                        + "WHERE uid = " + returns.get(4);
+//                String getCourseQuery = "from course "
+//                        + "WHERE lid = " + lecture.getLid();
+//                String getCourseDayTimeQuery = "from course_day_time "
+//                        + "WHERE lid = " + lecture.getLid();
+//                query = session.createQuery(getRoomQuery);
+//                List roomResult = query.list();
+//                query = session.createQuery(getUserQuery);
+//                List userResult = query.list();
+//                query = session.createQuery(getCourseQuery);
+//                List courseResult = query.list();
+//                query = session.createQuery(getCourseDayTimeQuery);
+//                List courseDayTimeResult = query.list();
+//            }
+//            if (returnsEv.size() > 0) {
+//                String getRoomQuery = "from room "
+//                        + "WHERE rid = " + returns.get(3);
+//                String getUserQuery = "from user "
+//                        + "WHERE uid = " + returns.get(4);
+//                String getEventQuery = "from event "
+//                        + "WHERE lid = " + lecture.getLid();
+//                query = session.createQuery(getRoomQuery);
+//                List roomResult = query.list();
+//                query = session.createQuery(getUserQuery);
+//                List userResult = query.list();
+//                query = session.createQuery(getEventQuery);
+//                List eventResult = query.list();
+//                room = new Room((Integer) roomResult.get(0), (String) roomResult.get(1), (int) roomResult.get(2));
+//                staff = new User((Integer) userResult.get(0), (String) userResult.get(1), (String) userResult.get(2), (String) userResult.get(3), (String) userResult.get(4));
+//                Event event = new Event(lecture, 0, (Date) eventResult.get(2), (Date) eventResult.get(3), (Date) eventResult.get(4));
+//            }
+//
+//        }
     }//GEN-LAST:event_btShowPreferencesActionPerformed
+
+    private Object[][] getTimeChooseModel(ArrayList<CourseDayTime> al) {
+        Object[][] obj = {{"Monday", "08:00", "08:00", false},
+        {"Tuesday", "08:00", "08:00", false},
+        {"Wednesday", "08:00", "08:00", false},
+        {"Thursday", "08:00", "08:00", false},
+        {"Friday", "08:00", "08:00", false},
+        {"Saturday", "08:00", "08:00", false},
+        {"Sunday", "08:00", "08:00", false}};
+        ArrayList<CourseDayTime> help;
+        String weekday;
+        GregorianCalendar gc = new GregorianCalendar();
+        String dayName = gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH);
+
+        for (int j = 0; j < 7; j++) {
+            for (int i = 0; i < al.size(); i++) {
+                gc.setTime(al.get(i).getDay());
+                switch (j) {
+                    case 0:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Monday")) {
+                            obj[0][0] = "Monday";
+                            obj[0][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[0][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[0][3] = true;
+                        }
+                        break;
+                    case 1:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Tuesday")) {
+                            obj[1][0] = "Tuesday";
+                            obj[1][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[1][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[1][3] = true;
+                        }
+                        break;
+                    case 2:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Wednesday")) {
+                            obj[2][0] = "Wednesday";
+                            obj[2][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[2][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[2][3] = true;
+                        }
+                        break;
+                    case 3:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Thursday")) {
+                            obj[3][0] = "Thursday";
+                            obj[3][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[3][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[3][3] = true;
+                        }
+                        break;
+                    case 4:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Friday")) {
+                            obj[4][0] = "Friday";
+                            obj[4][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[4][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[4][3] = true;
+                        }
+                        break;
+                    case 5:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Saturday")) {
+                            obj[5][0] = "Saturday";
+                            obj[5][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[5][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[5][3] = true;
+                        }
+                        break;
+                    case 6:
+                        if (gc.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).equals("Sunday")) {
+                            obj[6][0] = "Sunday";
+                            obj[6][1] = new SimpleDateFormat("HH:mm").format(al.get(i).getVon());
+                            obj[6][2] = new SimpleDateFormat("HH:mm").format(al.get(i).getBis());
+                            obj[6][3] = true;
+                        }
+                        break;
+                }
+            }
+        }
+
+        return obj;
+    }
 
     /**
      * @param args the command line arguments
@@ -481,9 +773,8 @@ public class AssignCourseDialog extends javax.swing.JDialog {
             }
         });
     }
-    
-    
-        private void changeGUI() {
+
+    private void changeGUI() {
         if (bgCourseEvent.getSelection().getActionCommand().equals("Course")) {
             jLabel4.setVisible(false);
             jLabel5.setVisible(false);
@@ -514,28 +805,28 @@ public class AssignCourseDialog extends javax.swing.JDialog {
         }
 
     }
-    
+
     private class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
 
-    private String datePattern = "dd.MM.yyyy";
-    private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
+        private String datePattern = "dd.MM.yyyy";
+        private SimpleDateFormat dateFormatter = new SimpleDateFormat(datePattern);
 
-    @Override
-    public Object stringToValue(String text) throws ParseException {
-        return dateFormatter.parseObject(text);
-    }
-
-    @Override
-    public String valueToString(Object value) throws ParseException {
-        if (value != null) {
-            Calendar cal = (Calendar) value;
-            return dateFormatter.format(cal.getTime());
+        @Override
+        public Object stringToValue(String text) throws ParseException {
+            return dateFormatter.parseObject(text);
         }
 
-        return "";
-    }
+        @Override
+        public String valueToString(Object value) throws ParseException {
+            if (value != null) {
+                Calendar cal = (Calendar) value;
+                return dateFormatter.format(cal.getTime());
+            }
 
-}
+            return "";
+        }
+
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgCourseEvent;

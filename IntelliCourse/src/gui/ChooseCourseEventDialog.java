@@ -162,27 +162,27 @@ public class ChooseCourseEventDialog extends javax.swing.JDialog {
         {
         sql = "select l.lid, l.name, l.beschreibung from Lecture as l INNER JOIN course USING(lid) "
                 + "WHERE UPPER(l.name) LIKE '" + tfName.getText().trim().toUpperCase() + "%' "
-                + "AND rid IS NULL";
+                + "AND preference IS NULL";
         }
         else if (!isCourse && fromPreference)
         {
             sql = "select l.lid, l.name, l.beschreibung from Lecture as l INNER JOIN event USING(lid) "
                 + "WHERE UPPER(l.name) LIKE '" + tfName.getText().trim().toUpperCase() + "%' "
-                    + "AND rid IS NULL";
+                    + "AND preference IS NULL";
         } 
         else if (isCourse && !fromPreference)
         {
             sql = "select l.lid, l.name, l.beschreibung from Lecture as l INNER JOIN course USING(lid) "
                 + "WHERE UPPER(l.name) LIKE '" + tfName.getText().trim().toUpperCase() + "%' "
                     + "AND preference = 1 OR "
-                    + "rid IS NULL";
+                    + "preference IS NULL";
         }
         else
         {
             sql = "select l.lid, l.name, l.beschreibung from Lecture as l INNER JOIN event USING(lid) "
                 + "WHERE UPPER(l.name) LIKE '" + tfName.getText().trim().toUpperCase() + "%' "
                     + "AND preference = 1 OR "
-                    + "rid IS NULL";
+                    + "preference IS NULL";
         }
         executeQuery(sql);
     }
@@ -213,7 +213,6 @@ public class ChooseCourseEventDialog extends javax.swing.JDialog {
         tableHead.add("Beschreibung");
         
         for (Object o : resultList) {
-            Lecture lecture = new Lecture();
             
             Lecture l = (Lecture) o;
             Vector<Object> row = new Vector<>();
